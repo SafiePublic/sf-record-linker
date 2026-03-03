@@ -37,7 +37,7 @@
     wrapper.style.cssText = `
       display: inline-flex;
       align-items: center;
-      margin-left: 6px;
+      margin-right: 6px;
       cursor: pointer;
       vertical-align: middle;
       opacity: 0.6;
@@ -121,14 +121,14 @@
     const nameEl = findRecordNameElement();
     if (!nameEl) return;
 
-    // primaryField の slot 要素の直後（h1 内末尾付近）に挿入
+    // primaryField の slot 要素の直前（レコード名の左隣）に挿入
     const primaryFieldSlot = document.querySelector(
       'records-highlights2 slot[name="primaryField"]'
     );
     const insertTarget = primaryFieldSlot || nameEl;
 
     const icon = createCopyIcon();
-    insertTarget.after(icon);
+    insertTarget.before(icon);
   }
 
   /**
