@@ -6,8 +6,6 @@ export interface ObjectSetting {
   showLabel: boolean;
   // カスタムモード（Phase 3）
   format: string;
-  // 共通（任意）
-  alias: string;
 }
 
 export interface ObjectSettings {
@@ -17,7 +15,6 @@ export interface ObjectSettings {
 export interface CardState {
   id: string;
   objectName: string;
-  alias: string;
   mode: 'simple' | 'custom';
   fieldLabel: string;
   showLabel: boolean;

@@ -39,17 +39,6 @@ export function ObjectCard({ card, errors, onChange, onRemove }: ObjectCardProps
         />
       </div>
 
-      <div class="field-group">
-        <label>オブジェクト名(別名)（任意）</label>
-        <input
-          type="text"
-          class="input-field"
-          value={card.alias}
-          placeholder="例: 商"
-          onInput={(e) => update({ alias: (e.target as HTMLInputElement).value })}
-        />
-      </div>
-
       <SegmentControl mode={card.mode} onChange={(mode) => update({ mode })} />
 
       <div class={`mode-section${card.mode === "simple" ? " visible" : ""}`}>
@@ -82,7 +71,7 @@ export function ObjectCard({ card, errors, onChange, onRemove }: ObjectCardProps
             onInput={(e) => update({ format: (e.target as HTMLInputElement).value })}
           />
           <div class="help-text">
-            <code>{"${name}"}</code> レコード名 / <code>{"${object}"}</code> オブジェクト名 / <code>{"${alias}"}</code> 別名
+            <code>{"${name}"}</code> レコード名 / <code>{"${object}"}</code> オブジェクト名
             <br />
             <code>{"${項目ラベル名}"}</code> で任意の項目値を参照できます
           </div>

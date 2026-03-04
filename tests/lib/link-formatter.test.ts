@@ -105,7 +105,7 @@ describe("extractFieldLabels", () => {
 
   it("excludes builtin variables", () => {
     expect(
-      extractFieldLabels("${object}: ${name} - ${alias}"),
+      extractFieldLabels("${object}: ${name}"),
     ).toEqual([]);
   });
 
@@ -136,7 +136,6 @@ describe("formatTemplateLink", () => {
       "${name}",
       {},
       "商品",
-      "商",
     );
     expect(result.html).toBe('<a href="https://example.com">Product A</a>');
     expect(result.plain).toBe("Product A");
@@ -149,7 +148,6 @@ describe("formatTemplateLink", () => {
       "${name}(${商品コード})",
       { 商品コード: "ABC-001" },
       "商品",
-      "商",
     );
     expect(result.plain).toBe("Product A(ABC-001)");
   });
@@ -161,21 +159,19 @@ describe("formatTemplateLink", () => {
       "${name}(${商品コード} / ${カテゴリ})",
       { 商品コード: "ABC-001", カテゴリ: "Electronics" },
       "商品",
-      "商",
     );
     expect(result.plain).toBe("Product A(ABC-001 / Electronics)");
   });
 
-  it("expands ${object} and ${alias}", () => {
+  it("expands ${object}", () => {
     const result = formatTemplateLink(
       "Product A",
       url,
-      "[${alias}]${name} - ${object}",
+      "${name} - ${object}",
       {},
       "商品",
-      "商",
     );
-    expect(result.plain).toBe("[商]Product A - 商品");
+    expect(result.plain).toBe("Product A - 商品");
   });
 
   it("escapes HTML in expanded text", () => {
@@ -185,7 +181,6 @@ describe("formatTemplateLink", () => {
       "${name}(${val})",
       { val: '<script>"xss"</script>' },
       "Obj",
-      "O",
     );
     expect(result.html).toBe(
       '<a href="https://example.com">R&amp;D(&lt;script&gt;&quot;xss&quot;&lt;/script&gt;)</a>',
@@ -199,7 +194,6 @@ describe("formatTemplateLink", () => {
       "${name}(${unknown})",
       {},
       "Obj",
-      "O",
     );
     expect(result.plain).toBe("Rec()");
   });

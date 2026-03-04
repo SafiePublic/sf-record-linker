@@ -10,7 +10,6 @@ function makeCard(overrides: Partial<CardState> = {}): CardState {
   return {
     id: "1",
     objectName: "商品",
-    alias: "商",
     mode: "simple",
     fieldLabel: "商品コード",
     showLabel: true,
@@ -67,10 +66,10 @@ describe("ObjectCard", () => {
     expect(screen.getByText("レコード名([商品コード])")).toBeTruthy();
   });
 
-  it("shows custom mode preview with object and alias", () => {
-    const card = makeCard({ mode: "custom", format: "[${alias}]${name} - ${object}" });
+  it("shows custom mode preview with object", () => {
+    const card = makeCard({ mode: "custom", format: "${name} - ${object}" });
     render(<ObjectCard card={card} errors={[]} onChange={vi.fn()} onRemove={vi.fn()} />);
-    expect(screen.getByText("[商]レコード名 - 商品")).toBeTruthy();
+    expect(screen.getByText("レコード名 - 商品")).toBeTruthy();
   });
 
   it("applies error class on objectName error", () => {

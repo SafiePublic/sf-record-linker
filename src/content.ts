@@ -105,7 +105,6 @@ function buildLink(
         setting.format,
         fieldValues,
         objectLabel ?? '',
-        setting.alias ?? '',
       );
     }
 

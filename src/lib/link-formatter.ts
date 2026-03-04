@@ -29,7 +29,7 @@ export function formatExtendedLink(
   };
 }
 
-const BUILTIN_VARS = new Set(['name', 'object', 'alias']);
+const BUILTIN_VARS = new Set(['name', 'object']);
 
 export function extractFieldLabels(format: string): string[] {
   const matches = format.matchAll(/\$\{([^}]+)\}/g);
@@ -48,12 +48,10 @@ export function formatTemplateLink(
   format: string,
   fieldValues: Record<string, string>,
   objectLabel: string,
-  alias: string,
 ): LinkResult {
   const displayText = format.replace(/\$\{([^}]+)\}/g, (_, key: string) => {
     if (key === 'name') return recordName;
     if (key === 'object') return objectLabel;
-    if (key === 'alias') return alias;
     return fieldValues[key] ?? '';
   });
   const escaped = escapeHtml(displayText);

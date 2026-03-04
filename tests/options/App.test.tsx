@@ -85,9 +85,9 @@ describe("App", () => {
     fireEvent.click(screen.getByText("+ オブジェクトを追加"));
 
     const inputs = document.querySelectorAll<HTMLInputElement>(".input-field");
-    // Per card: objectName=0, alias=1, fieldLabel=2, format=3
+    // Per card: objectName=0, fieldLabel=1, format=2
     setInputValue(inputs[0], "商品");
-    setInputValue(inputs[2], "商品コード");
+    setInputValue(inputs[1], "商品コード");
 
     fireEvent.click(screen.getByText("保存"));
 
@@ -101,7 +101,6 @@ describe("App", () => {
               fieldLabel: "商品コード",
               showLabel: true,
               format: "",
-              alias: "",
             },
           },
         },
@@ -122,7 +121,6 @@ describe("App", () => {
         fieldLabel: "商品コード",
         showLabel: true,
         format: "",
-        alias: "商",
       },
     };
 
@@ -137,16 +135,16 @@ describe("App", () => {
     fireEvent.click(screen.getByText("+ オブジェクトを追加"));
     fireEvent.click(screen.getByText("+ オブジェクトを追加"));
 
-    // Per card: objectName, alias, fieldLabel, format (4 inputs each)
-    // Card 1: 0,1,2,3 — Card 2: 4,5,6,7
+    // Per card: objectName, fieldLabel, format (3 inputs each)
+    // Card 1: 0,1,2 — Card 2: 3,4,5
     const inputs1 = document.querySelectorAll<HTMLInputElement>(".input-field");
     setInputValue(inputs1[0], "商品");
-    setInputValue(inputs1[2], "商品コード");
+    setInputValue(inputs1[1], "商品コード");
 
     // Re-query after re-renders
     const inputs2 = document.querySelectorAll<HTMLInputElement>(".input-field");
-    setInputValue(inputs2[4], "商品");
-    setInputValue(inputs2[6], "カテゴリ");
+    setInputValue(inputs2[3], "商品");
+    setInputValue(inputs2[4], "カテゴリ");
 
     fireEvent.click(screen.getByText("保存"));
 

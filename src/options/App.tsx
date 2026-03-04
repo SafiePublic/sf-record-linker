@@ -25,7 +25,6 @@ function createCard(overrides: Partial<CardState> = {}): CardState {
   return {
     id: String(nextId++),
     objectName: "",
-    alias: "",
     mode: "simple",
     fieldLabel: "",
     showLabel: true,
@@ -76,7 +75,6 @@ export function App() {
           fieldLabel: val.fieldLabel,
           showLabel: val.showLabel,
           format: val.format,
-          alias: val.alias,
         }),
       );
     dispatch({ type: "load", cards });
@@ -107,7 +105,6 @@ export function App() {
         fieldLabel: card.fieldLabel.trim(),
         showLabel: card.showLabel,
         format: card.format.trim(),
-        alias: card.alias.trim(),
       };
     }
 

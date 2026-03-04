@@ -2,7 +2,6 @@ import type { CardState } from "../../lib/types";
 
 function computePreviewText(card: CardState): string {
   const objectName = card.objectName.trim() || "オブジェクト名";
-  const alias = card.alias.trim() || "別名";
 
   if (card.mode === "custom") {
     const format = card.format.trim();
@@ -10,7 +9,6 @@ function computePreviewText(card: CardState): string {
     return format.replace(/\$\{([^}]+)\}/g, (_, key: string) => {
       if (key === "name") return "レコード名";
       if (key === "object") return objectName;
-      if (key === "alias") return alias;
       return `[${key}]`;
     });
   }
