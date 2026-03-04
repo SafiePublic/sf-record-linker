@@ -1,3 +1,7 @@
+import { joinLinks } from "./lib/link-formatter";
+import type { GlobalSettings } from "./lib/types";
+import { DEFAULT_GLOBAL_SETTINGS } from "./lib/types";
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.action.disable();
   chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
@@ -61,8 +65,11 @@ chrome.action.onClicked.addListener(async (tab) => {
       return;
     }
 
-    const html = links.map((l) => l.html).join("<br>");
-    const plain = links.map((l) => l.plain).join("\n");
+    const { globalSettings } = await chrome.storage.sync.get({
+      globalSettings: DEFAULT_GLOBAL_SETTINGS,
+    }) as { globalSettings: GlobalSettings };
+
+    const { html, plain } = joinLinks(links, globalSettings.bulletList);
 
     const response = await chrome.tabs.sendMessage(tab.id, {
       action: "copyToClipboard",

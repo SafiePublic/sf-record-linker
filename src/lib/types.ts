@@ -31,3 +31,13 @@ export interface ValidationResult {
   errors: ValidationError[];
   duplicateObjectNames: string[];
 }
+
+export interface GlobalSettings {
+  bulletList: boolean;
+  linkNameOnly: boolean;
+}
+
+export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
+  bulletList: true,
+  linkNameOnly: true,
+};

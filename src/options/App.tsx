@@ -1,9 +1,11 @@
-import { useReducer, useEffect } from "preact/hooks";
-import type { CardState, ObjectSettings, ValidationError } from "../lib/types";
+import { useReducer, useEffect, useState } from "preact/hooks";
+import type { CardState, ObjectSettings, GlobalSettings, ValidationError } from "../lib/types";
+import { DEFAULT_GLOBAL_SETTINGS } from "../lib/types";
 import { validateCards } from "../lib/validation";
 import { useChromeStorage } from "./hooks/useChromeStorage";
 import { useToast } from "./hooks/useToast";
 import { ObjectCard } from "./components/ObjectCard";
+import { Toggle } from "./components/Toggle";
 import { Toast } from "./components/Toast";
 
 type Action =
@@ -53,13 +55,20 @@ function reducer(state: State, action: Action): State {
 }
 
 export function App() {
-  const [storedSettings, saveSettings] = useChromeStorage();
+  const [storedSettings, storedGlobalSettings, saveSettings] = useChromeStorage();
   const [toastMessage, toastVisible, showToast] = useToast();
+  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
+    ...DEFAULT_GLOBAL_SETTINGS,
+  });
   const [state, dispatch] = useReducer(reducer, {
     cards: [],
     errors: [],
     duplicateObjectNames: [],
   });
+
+  useEffect(() => {
+    setGlobalSettings(storedGlobalSettings);
+  }, [storedGlobalSettings]);
 
   useEffect(() => {
     const entries = Object.entries(storedSettings);
@@ -108,7 +117,7 @@ export function App() {
       };
     }
 
-    await saveSettings(objectSettings);
+    await saveSettings(objectSettings, globalSettings);
     showToast("設定を保存しました");
   };
 
@@ -118,8 +127,31 @@ export function App() {
   return (
     <>
       <div class="page-header">
-        <h1>SF Record Linker 設定</h1>
+        <div class="page-header-row">
+          <h1>SF Record Linker 設定</h1>
+          <button class="btn-save" onClick={handleSave}>
+            保存
+          </button>
+        </div>
         <p>オブジェクトごとにリンクテキストに含める項目を設定します。</p>
+      </div>
+
+      <div class="global-settings">
+        <div class="global-settings-heading">全体設定</div>
+        <Toggle
+          label="複数タブ時に箇条書きでコピー"
+          checked={globalSettings.bulletList}
+          onChange={(bulletList) =>
+            setGlobalSettings((prev) => ({ ...prev, bulletList }))
+          }
+        />
+        <Toggle
+          label="レコード名のみリンクにする"
+          checked={globalSettings.linkNameOnly}
+          onChange={(linkNameOnly) =>
+            setGlobalSettings((prev) => ({ ...prev, linkNameOnly }))
+          }
+        />
       </div>
 
       <div id="cards">
@@ -128,6 +160,7 @@ export function App() {
             key={card.id}
             card={card}
             errors={errorsForCard(card.id)}
+            linkNameOnly={globalSettings.linkNameOnly}
             onChange={(updated) => dispatch({ type: "update", card: updated })}
             onRemove={() => dispatch({ type: "remove", id: card.id })}
           />
@@ -137,12 +170,6 @@ export function App() {
       <button class="btn-add" onClick={() => dispatch({ type: "add" })}>
         + オブジェクトを追加
       </button>
-
-      <div class="footer-actions">
-        <button class="btn-save" onClick={handleSave}>
-          保存
-        </button>
-      </div>
 
       <Toast message={toastMessage} visible={toastVisible} />
     </>

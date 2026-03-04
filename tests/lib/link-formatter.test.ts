@@ -5,6 +5,7 @@ import {
   formatTemplateLink,
   extractFieldLabels,
   escapeHtml,
+  joinLinks,
 } from "../../src/lib/link-formatter";
 
 describe("escapeHtml", () => {
@@ -55,7 +56,7 @@ describe("formatBasicLink", () => {
 });
 
 describe("formatExtendedLink", () => {
-  it("appends field value without label when showLabel is false", () => {
+  it("links name only by default (showLabel=false)", () => {
     const result = formatExtendedLink(
       "Record",
       "https://example.com",
@@ -64,12 +65,12 @@ describe("formatExtendedLink", () => {
       false,
     );
     expect(result.html).toBe(
-      '<a href="https://example.com">Record(ABC-001)</a>',
+      '<a href="https://example.com">Record</a>(ABC-001)',
     );
     expect(result.plain).toBe("Record(ABC-001)");
   });
 
-  it("appends label:value when showLabel is true", () => {
+  it("links name only by default (showLabel=true)", () => {
     const result = formatExtendedLink(
       "Record",
       "https://example.com",
@@ -78,12 +79,12 @@ describe("formatExtendedLink", () => {
       true,
     );
     expect(result.html).toBe(
-      '<a href="https://example.com">Record(Code:ABC-001)</a>',
+      '<a href="https://example.com">Record</a>(Code:ABC-001)',
     );
     expect(result.plain).toBe("Record(Code:ABC-001)");
   });
 
-  it("escapes HTML in combined display text", () => {
+  it("escapes HTML in name-only mode", () => {
     const result = formatExtendedLink(
       "R&D",
       "https://example.com",
@@ -92,9 +93,39 @@ describe("formatExtendedLink", () => {
       true,
     );
     expect(result.html).toBe(
-      '<a href="https://example.com">R&amp;D(Label:Val&lt;1&gt;&quot;)</a>',
+      '<a href="https://example.com">R&amp;D</a>(Label:Val&lt;1&gt;&quot;)',
     );
     expect(result.plain).toBe('R&D(Label:Val<1>")');
+  });
+
+  it("links entire text when linkNameOnly=false", () => {
+    const result = formatExtendedLink(
+      "Record",
+      "https://example.com",
+      "Code",
+      "ABC-001",
+      false,
+      false,
+    );
+    expect(result.html).toBe(
+      '<a href="https://example.com">Record(ABC-001)</a>',
+    );
+    expect(result.plain).toBe("Record(ABC-001)");
+  });
+
+  it("links entire text with label when linkNameOnly=false", () => {
+    const result = formatExtendedLink(
+      "Record",
+      "https://example.com",
+      "Code",
+      "ABC-001",
+      true,
+      false,
+    );
+    expect(result.html).toBe(
+      '<a href="https://example.com">Record(Code:ABC-001)</a>',
+    );
+    expect(result.plain).toBe("Record(Code:ABC-001)");
   });
 });
 
@@ -129,7 +160,7 @@ describe("extractFieldLabels", () => {
 describe("formatTemplateLink", () => {
   const url = "https://example.com";
 
-  it("expands ${name} only — equivalent to basic link", () => {
+  it("links name only by default when ${name} present", () => {
     const result = formatTemplateLink(
       "Product A",
       url,
@@ -141,13 +172,16 @@ describe("formatTemplateLink", () => {
     expect(result.plain).toBe("Product A");
   });
 
-  it("expands ${name} with a single field", () => {
+  it("links name only with a single field", () => {
     const result = formatTemplateLink(
       "Product A",
       url,
       "${name}(${商品コード})",
       { 商品コード: "ABC-001" },
       "商品",
+    );
+    expect(result.html).toBe(
+      '<a href="https://example.com">Product A</a>(ABC-001)',
     );
     expect(result.plain).toBe("Product A(ABC-001)");
   });
@@ -174,7 +208,7 @@ describe("formatTemplateLink", () => {
     expect(result.plain).toBe("Product A - 商品");
   });
 
-  it("escapes HTML in expanded text", () => {
+  it("escapes HTML in name-only mode", () => {
     const result = formatTemplateLink(
       "R&D",
       url,
@@ -183,7 +217,7 @@ describe("formatTemplateLink", () => {
       "Obj",
     );
     expect(result.html).toBe(
-      '<a href="https://example.com">R&amp;D(&lt;script&gt;&quot;xss&quot;&lt;/script&gt;)</a>',
+      '<a href="https://example.com">R&amp;D</a>(&lt;script&gt;&quot;xss&quot;&lt;/script&gt;)',
     );
   });
 
@@ -196,5 +230,77 @@ describe("formatTemplateLink", () => {
       "Obj",
     );
     expect(result.plain).toBe("Rec()");
+  });
+
+  it("links entire text when linkNameOnly=false", () => {
+    const result = formatTemplateLink(
+      "Product A",
+      url,
+      "${name}(${商品コード})",
+      { 商品コード: "ABC-001" },
+      "商品",
+      false,
+    );
+    expect(result.html).toBe(
+      '<a href="https://example.com">Product A(ABC-001)</a>',
+    );
+    expect(result.plain).toBe("Product A(ABC-001)");
+  });
+
+  it("links entire text when no ${name} in format (even if linkNameOnly=true)", () => {
+    const result = formatTemplateLink(
+      "Product A",
+      url,
+      "${object}: ${商品コード}",
+      { 商品コード: "ABC-001" },
+      "商品",
+      true,
+    );
+    expect(result.html).toBe(
+      '<a href="https://example.com">商品: ABC-001</a>',
+    );
+    expect(result.plain).toBe("商品: ABC-001");
+  });
+
+  it("handles multiple ${name} occurrences", () => {
+    const result = formatTemplateLink(
+      "Rec",
+      url,
+      "${name} - ${name}",
+      {},
+      "Obj",
+    );
+    expect(result.html).toBe(
+      '<a href="https://example.com">Rec</a> - <a href="https://example.com">Rec</a>',
+    );
+    expect(result.plain).toBe("Rec - Rec");
+  });
+});
+
+describe("joinLinks", () => {
+  it("returns single link as-is", () => {
+    const link = { html: "<a>Link</a>", plain: "Link" };
+    expect(joinLinks([link], true)).toEqual(link);
+    expect(joinLinks([link], false)).toEqual(link);
+  });
+
+  it("joins multiple links as bullet list when bulletList=true", () => {
+    const links = [
+      { html: "<a>A</a>", plain: "A" },
+      { html: "<a>B</a>", plain: "B" },
+    ];
+    const result = joinLinks(links, true);
+    expect(result.html).toBe("<ul><li><a>A</a></li><li><a>B</a></li></ul>");
+    expect(result.plain).toBe("- A\n- B");
+  });
+
+  it("joins multiple links with br when bulletList=false", () => {
+    const links = [
+      { html: "<a>A</a>", plain: "A" },
+      { html: "<a>B</a>", plain: "B" },
+    ];
+    const result = joinLinks(links, false);
+    expect(result.html).toBe("<a>A</a><br><a>B</a>");
+    expect(result.plain).toBe("A\nB");
   });
 });

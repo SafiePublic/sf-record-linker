@@ -6,11 +6,12 @@ import { Preview } from "./Preview";
 interface ObjectCardProps {
   card: CardState;
   errors: ValidationError[];
+  linkNameOnly: boolean;
   onChange: (card: CardState) => void;
   onRemove: () => void;
 }
 
-export function ObjectCard({ card, errors, onChange, onRemove }: ObjectCardProps) {
+export function ObjectCard({ card, errors, linkNameOnly, onChange, onRemove }: ObjectCardProps) {
   const hasError = errors.length > 0;
   const fieldError = (field: ValidationError["field"]) =>
     errors.some((e) => e.field === field);
@@ -78,7 +79,7 @@ export function ObjectCard({ card, errors, onChange, onRemove }: ObjectCardProps
         </div>
       </div>
 
-      <Preview card={card} />
+      <Preview card={card} linkNameOnly={linkNameOnly} />
     </div>
   );
 }

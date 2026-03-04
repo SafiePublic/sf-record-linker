@@ -2,10 +2,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/preact";
 import { App } from "../../src/options/App";
+import { DEFAULT_GLOBAL_SETTINGS } from "../../src/lib/types";
 
 // Mock chrome.storage API
 const storageMock = {
   objectSettings: {} as Record<string, unknown>,
+  globalSettings: { ...DEFAULT_GLOBAL_SETTINGS } as Record<string, unknown>,
 };
 
 const changeListeners: Array<(changes: Record<string, unknown>) => void> = [];
@@ -40,6 +42,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   changeListeners.length = 0;
   storageMock.objectSettings = {};
+  storageMock.globalSettings = { ...DEFAULT_GLOBAL_SETTINGS };
   cleanup();
 });
 
@@ -48,6 +51,13 @@ describe("App", () => {
     render(<App />);
     expect(screen.getByText("SF Record Linker 設定")).toBeTruthy();
     expect(screen.getByText("オブジェクトごとにリンクテキストに含める項目を設定します。")).toBeTruthy();
+  });
+
+  it("renders global settings section", () => {
+    render(<App />);
+    expect(screen.getByText("全体設定")).toBeTruthy();
+    expect(screen.getByText("複数タブ時に箇条書きでコピー")).toBeTruthy();
+    expect(screen.getByText("レコード名のみリンクにする")).toBeTruthy();
   });
 
   it("starts with no cards", () => {
@@ -80,7 +90,7 @@ describe("App", () => {
     });
   });
 
-  it("saves valid settings to chrome.storage", async () => {
+  it("saves valid settings with globalSettings to chrome.storage", async () => {
     render(<App />);
     fireEvent.click(screen.getByText("+ オブジェクトを追加"));
 
@@ -102,6 +112,10 @@ describe("App", () => {
               showLabel: true,
               format: "",
             },
+          },
+          globalSettings: {
+            bulletList: true,
+            linkNameOnly: true,
           },
         },
         expect.any(Function),
@@ -151,5 +165,37 @@ describe("App", () => {
     await waitFor(() => {
       expect(screen.getByText("オブジェクト名が重複しています")).toBeTruthy();
     });
+  });
+
+  it("saves toggled globalSettings", async () => {
+    render(<App />);
+
+    // Toggle bulletList off (第1トグル = global settings の1つ目)
+    const toggles = document.querySelectorAll<HTMLInputElement>(".global-settings .toggle-input");
+    fireEvent.change(toggles[0], { target: { checked: false } });
+
+    fireEvent.click(screen.getByText("保存"));
+
+    await waitFor(() => {
+      expect(chromeMock.storage.sync.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          globalSettings: {
+            bulletList: false,
+            linkNameOnly: true,
+          },
+        }),
+        expect.any(Function),
+      );
+    });
+  });
+
+  it("loads globalSettings from chrome.storage", () => {
+    storageMock.globalSettings = { bulletList: false, linkNameOnly: false };
+
+    render(<App />);
+
+    const toggles = document.querySelectorAll<HTMLInputElement>(".global-settings .toggle-input");
+    expect(toggles[0].checked).toBe(false);
+    expect(toggles[1].checked).toBe(false);
   });
 });

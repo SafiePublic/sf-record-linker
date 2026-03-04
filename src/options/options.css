@@ -31,6 +31,12 @@ body {
   margin-bottom: 28px;
 }
 
+.page-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .page-header h1 {
   font-size: 22px;
   font-weight: 700;
@@ -41,6 +47,29 @@ body {
   color: var(--text-secondary);
   font-size: 13px;
   margin-top: 4px;
+}
+
+/* ── グローバル設定 ── */
+.global-settings {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.global-settings-heading {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.global-settings .toggle-row:last-child {
+  margin-bottom: 0;
 }
 
 /* ── 設定カード ── */
@@ -272,12 +301,7 @@ body {
   color: var(--accent);
 }
 
-/* ── フッターアクション ── */
-.footer-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
+/* ── 保存ボタン ── */
 .btn-save {
   background: var(--accent);
   color: #fff;

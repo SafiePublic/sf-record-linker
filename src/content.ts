@@ -4,7 +4,8 @@ import {
   formatTemplateLink,
   extractFieldLabels,
 } from "./lib/link-formatter";
-import type { ObjectSettings } from "./lib/types";
+import type { ObjectSettings, GlobalSettings } from "./lib/types";
+import { DEFAULT_GLOBAL_SETTINGS } from "./lib/types";
 
 function querySelectorInShadowDOM(
   root: Document | ShadowRoot | Element,
@@ -89,6 +90,7 @@ function buildLink(
 
     if (!setting?.enabled) return formatBasicLink(recordName, url);
 
+    const linkNameOnly = cachedGlobalSettings.linkNameOnly;
     const mode = setting.mode ?? 'simple';
 
     if (mode === 'custom' && setting.format) {
@@ -105,6 +107,7 @@ function buildLink(
         setting.format,
         fieldValues,
         objectLabel ?? '',
+        linkNameOnly,
       );
     }
 
@@ -117,6 +120,7 @@ function buildLink(
           setting.fieldLabel,
           fieldValue,
           setting.showLabel,
+          linkNameOnly,
         );
       }
     }
@@ -127,6 +131,7 @@ function buildLink(
 }
 
 let cachedSettings: ObjectSettings = {};
+let cachedGlobalSettings: GlobalSettings = { ...DEFAULT_GLOBAL_SETTINGS };
 
 function isRecordPage(): boolean {
   return /\/lightning\/r\/[^/]+\/[^/]+\/view/.test(window.location.pathname);
@@ -175,11 +180,18 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 });
 
-chrome.storage.sync.get({ objectSettings: {} }, (result) => {
-  cachedSettings = result.objectSettings as ObjectSettings;
-});
+chrome.storage.sync.get(
+  { objectSettings: {}, globalSettings: DEFAULT_GLOBAL_SETTINGS },
+  (result) => {
+    cachedSettings = result.objectSettings as ObjectSettings;
+    cachedGlobalSettings = result.globalSettings as GlobalSettings;
+  },
+);
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.objectSettings) {
     cachedSettings = changes.objectSettings.newValue as ObjectSettings;
+  }
+  if (changes.globalSettings) {
+    cachedGlobalSettings = changes.globalSettings.newValue as GlobalSettings;
   }
 });
