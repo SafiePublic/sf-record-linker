@@ -74,18 +74,37 @@ sf-record-linker/
 ├── src/
 │   ├── content.ts             # Content Script（メッセージ受信・DOM探索・クリップボードコピー）
 │   ├── background.ts          # Service Worker（アイコンクリック・declarativeContent）
-│   ├── options.ts             # 設定画面ロジック
+│   ├── options/               # 設定画面（Preact）
+│   │   ├── index.tsx          # エントリポイント
+│   │   ├── App.tsx            # メインコンポーネント（useReducer で状態管理）
+│   │   ├── components/        # UI コンポーネント
+│   │   │   ├── ObjectCard.tsx
+│   │   │   ├── SegmentControl.tsx
+│   │   │   ├── Toggle.tsx
+│   │   │   ├── Preview.tsx
+│   │   │   └── Toast.tsx
+│   │   ├── hooks/             # カスタムフック
+│   │   │   ├── useChromeStorage.ts
+│   │   │   └── useToast.ts
+│   │   ├── options.html       # 設定画面 HTML
+│   │   └── options.css        # スタイル
 │   └── lib/
 │       ├── link-formatter.ts  # リンク生成ロジック
+│       ├── validation.ts      # バリデーション純粋関数
 │       └── types.ts           # 共有型定義
 ├── tests/
-│   └── lib/
-│       └── link-formatter.test.ts
+│   ├── lib/
+│   │   ├── link-formatter.test.ts
+│   │   └── validation.test.ts
+│   └── options/
+│       ├── App.test.tsx
+│       ├── ObjectCard.test.tsx
+│       └── hooks/
+│           └── useChromeStorage.test.ts
 ├── scripts/
 │   └── build.mjs             # esbuild ビルドスクリプト
 ├── dist/                      # ビルド出力（Chrome 拡張として読み込む）
 ├── manifest.json              # Chrome Extension Manifest V3
-├── options.html               # 設定画面 HTML
 ├── icons/
 │   ├── icon16.png
 │   ├── icon48.png
@@ -99,7 +118,8 @@ sf-record-linker/
 
 - Chrome Extension Manifest V3
 - TypeScript + esbuild（IIFE バンドル）
-- Vitest（テスト）
+- Preact — 設定画面の宣言的 UI
+- Vitest + @testing-library/preact（テスト）
 - Service Worker + declarativeContent — レコードページでのみアイコン有効化
 - Content Script（`*://*.lightning.force.com/*` で動作）
 - Clipboard API — text/html + text/plain 両方をセット

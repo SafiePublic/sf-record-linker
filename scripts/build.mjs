@@ -9,7 +9,8 @@ mkdirSync("dist", { recursive: true });
 
 // Copy static files
 copyFileSync("manifest.json", "dist/manifest.json");
-copyFileSync("options.html", "dist/options.html");
+copyFileSync("src/options/options.html", "dist/options.html");
+copyFileSync("src/options/options.css", "dist/options.css");
 cpSync("icons", "dist/icons", { recursive: true });
 
 const commonOptions = {
@@ -20,7 +21,12 @@ const commonOptions = {
 
 const entries = [
   { entryPoints: ["src/content.ts"], outfile: "dist/content.js" },
-  { entryPoints: ["src/options.ts"], outfile: "dist/options.js" },
+  {
+    entryPoints: ["src/options/index.tsx"],
+    outfile: "dist/options.js",
+    jsx: "automatic",
+    jsxImportSource: "preact",
+  },
   { entryPoints: ["src/background.ts"], outfile: "dist/background.js" },
 ];
 
