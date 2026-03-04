@@ -63,15 +63,12 @@ function createCopyIcon(): HTMLSpanElement {
   return wrapper;
 }
 
-function getObjectApiName(): string | null {
-  const el = document.querySelector(
-    "[data-target-selection-name^='sfdc:RecordField.']",
-  );
+function getObjectLabel(): string | null {
+  const el =
+    document.querySelector("records-entity-label") ||
+    document.querySelector(".entityNameTitle");
   if (!el) return null;
-  const attr = el.getAttribute("data-target-selection-name");
-  if (!attr) return null;
-  const match = attr.match(/^sfdc:RecordField\.([^.]+)\./);
-  return match ? match[1].toLowerCase() : null;
+  return el.textContent?.trim() || null;
 }
 
 function getFieldValue(fieldLabel: string): string | null {
@@ -93,13 +90,7 @@ function getFieldValue(fieldLabel: string): string | null {
   return output.textContent?.trim() || null;
 }
 
-function loadSettings(): Promise<ObjectSettings> {
-  return new Promise((resolve) => {
-    chrome.storage.sync.get({ objectSettings: {} }, (result) => {
-      resolve(result.objectSettings as ObjectSettings);
-    });
-  });
-}
+let cachedSettings: ObjectSettings = {};
 
 async function handleCopy(e: Event): Promise<void> {
   e.stopPropagation();
@@ -116,10 +107,9 @@ async function handleCopy(e: Event): Promise<void> {
   let plain: string;
 
   try {
-    const objectSettings = await loadSettings();
-    const objectApiName = getObjectApiName();
-    const setting = objectApiName
-      ? objectSettings[objectApiName]
+    const objectLabel = getObjectLabel();
+    const setting = objectLabel
+      ? cachedSettings[objectLabel]
       : undefined;
 
     if (setting?.enabled && setting.fieldLabel) {
@@ -203,6 +193,14 @@ function observePageChanges(): void {
 }
 
 function init(): void {
+  chrome.storage.sync.get({ objectSettings: {} }, (result) => {
+    cachedSettings = result.objectSettings as ObjectSettings;
+  });
+  chrome.storage.onChanged.addListener((changes) => {
+    if (changes.objectSettings) {
+      cachedSettings = changes.objectSettings.newValue as ObjectSettings;
+    }
+  });
   insertIcon();
   observePageChanges();
 }
