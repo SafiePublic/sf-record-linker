@@ -34,10 +34,14 @@ export interface ValidationResult {
 
 export interface GlobalSettings {
   bulletList: boolean;
+  bulletStyle: 'ul' | 'custom';
+  bulletChar: string;
   linkNameOnly: boolean;
 }
 
 export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
-  bulletList: true,
+  bulletList: false,
+  bulletStyle: 'custom',
+  bulletChar: '- ',
   linkNameOnly: true,
 };

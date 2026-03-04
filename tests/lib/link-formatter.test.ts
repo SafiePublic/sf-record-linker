@@ -278,29 +278,66 @@ describe("formatTemplateLink", () => {
 });
 
 describe("joinLinks", () => {
-  it("returns single link as-is", () => {
+  const bulletOff = { enabled: false, style: 'custom' as const, char: '- ' };
+  const bulletUl = { enabled: true, style: 'ul' as const, char: '- ' };
+  const bulletCustom = { enabled: true, style: 'custom' as const, char: '- ' };
+
+  it("returns single link as-is regardless of config", () => {
     const link = { html: "<a>Link</a>", plain: "Link" };
-    expect(joinLinks([link], true)).toEqual(link);
-    expect(joinLinks([link], false)).toEqual(link);
+    expect(joinLinks([link], bulletOff)).toEqual(link);
+    expect(joinLinks([link], bulletUl)).toEqual(link);
+    expect(joinLinks([link], bulletCustom)).toEqual(link);
   });
 
-  it("joins multiple links as bullet list when bulletList=true", () => {
+  it("joins multiple links with div when bullet disabled", () => {
     const links = [
       { html: "<a>A</a>", plain: "A" },
       { html: "<a>B</a>", plain: "B" },
     ];
-    const result = joinLinks(links, true);
-    expect(result.html).toBe("<ul><li><a>A</a></li><li><a>B</a></li></ul>");
+    const result = joinLinks(links, bulletOff);
+    expect(result.html).toBe("<div><a>A</a></div><div><a>B</a></div>");
+    expect(result.plain).toBe("A\nB");
+  });
+
+  it("joins multiple links as <ul> when style=ul", () => {
+    const links = [
+      { html: "<a>A</a>", plain: "A" },
+      { html: "<a>B</a>", plain: "B" },
+    ];
+    const result = joinLinks(links, bulletUl);
+    expect(result.html).toBe(
+      '<meta charset="utf-8"><div><ul><li><a>A</a></li><li><a>B</a></li></ul></div>',
+    );
     expect(result.plain).toBe("- A\n- B");
   });
 
-  it("joins multiple links with br when bulletList=false", () => {
+  it("joins multiple links with custom char when style=custom", () => {
     const links = [
       { html: "<a>A</a>", plain: "A" },
       { html: "<a>B</a>", plain: "B" },
     ];
-    const result = joinLinks(links, false);
-    expect(result.html).toBe("<a>A</a><br><a>B</a>");
-    expect(result.plain).toBe("A\nB");
+    const result = joinLinks(links, bulletCustom);
+    expect(result.html).toBe("<div>- <a>A</a></div><div>- <a>B</a></div>");
+    expect(result.plain).toBe("- A\n- B");
+  });
+
+  it("escapes HTML in custom bullet char", () => {
+    const links = [
+      { html: "<a>A</a>", plain: "A" },
+      { html: "<a>B</a>", plain: "B" },
+    ];
+    const result = joinLinks(links, { enabled: true, style: 'custom', char: '> ' });
+    expect(result.html).toBe("<div>&gt; <a>A</a></div><div>&gt; <a>B</a></div>");
+    expect(result.plain).toBe("> A\n> B");
+  });
+
+  it("supports custom bullet char like dot", () => {
+    const links = [
+      { html: "<a>A</a>", plain: "A" },
+      { html: "<a>B</a>", plain: "B" },
+    ];
+    const result = joinLinks(links, { enabled: true, style: 'custom', char: '・' });
+    expect(result.html).toBe("<div>・<a>A</a></div><div>・<a>B</a></div>");
+    expect(result.plain).toBe("・A\n・B");
   });
 });

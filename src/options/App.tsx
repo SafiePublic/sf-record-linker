@@ -139,19 +139,53 @@ export function App() {
       <div class="global-settings">
         <div class="global-settings-heading">全体設定</div>
         <Toggle
-          label="複数タブ時に箇条書きでコピー"
-          checked={globalSettings.bulletList}
-          onChange={(bulletList) =>
-            setGlobalSettings((prev) => ({ ...prev, bulletList }))
-          }
-        />
-        <Toggle
           label="レコード名のみリンクにする"
           checked={globalSettings.linkNameOnly}
           onChange={(linkNameOnly) =>
             setGlobalSettings((prev) => ({ ...prev, linkNameOnly }))
           }
         />
+        <Toggle
+          label="複数タブ時に箇条書きでコピー"
+          checked={globalSettings.bulletList}
+          onChange={(bulletList) =>
+            setGlobalSettings((prev) => ({ ...prev, bulletList }))
+          }
+        />
+        {globalSettings.bulletList && (
+          <>
+            <div class="segment-control" style={{ marginTop: '-4px' }}>
+              <button
+                class={`segment-btn ${globalSettings.bulletStyle === 'ul' ? 'active' : ''}`}
+                onClick={() => setGlobalSettings((prev) => ({ ...prev, bulletStyle: 'ul' as const }))}
+              >
+                &lt;ul&gt; 形式
+              </button>
+              <button
+                class={`segment-btn ${globalSettings.bulletStyle === 'custom' ? 'active' : ''}`}
+                onClick={() => setGlobalSettings((prev) => ({ ...prev, bulletStyle: 'custom' as const }))}
+              >
+                任意文字列
+              </button>
+            </div>
+            {globalSettings.bulletStyle === 'custom' && (
+              <div class="field-group" style={{ marginBottom: '16px' }}>
+                <label>接頭文字</label>
+                <input
+                  class="input-field"
+                  style={{ width: '80px' }}
+                  value={globalSettings.bulletChar}
+                  onInput={(e) =>
+                    setGlobalSettings((prev) => ({
+                      ...prev,
+                      bulletChar: (e.target as HTMLInputElement).value,
+                    }))
+                  }
+                />
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       <div id="cards">

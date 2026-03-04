@@ -114,7 +114,9 @@ describe("App", () => {
             },
           },
           globalSettings: {
-            bulletList: true,
+            bulletList: false,
+            bulletStyle: 'custom',
+            bulletChar: '- ',
             linkNameOnly: true,
           },
         },
@@ -170,9 +172,9 @@ describe("App", () => {
   it("saves toggled globalSettings", async () => {
     render(<App />);
 
-    // Toggle bulletList off (第1トグル = global settings の1つ目)
+    // Toggle bulletList on (第2トグル、デフォルトはfalse)
     const toggles = document.querySelectorAll<HTMLInputElement>(".global-settings .toggle-input");
-    fireEvent.change(toggles[0], { target: { checked: false } });
+    fireEvent.change(toggles[1], { target: { checked: true } });
 
     fireEvent.click(screen.getByText("保存"));
 
@@ -180,7 +182,9 @@ describe("App", () => {
       expect(chromeMock.storage.sync.set).toHaveBeenCalledWith(
         expect.objectContaining({
           globalSettings: {
-            bulletList: false,
+            bulletList: true,
+            bulletStyle: 'custom',
+            bulletChar: '- ',
             linkNameOnly: true,
           },
         }),
@@ -190,12 +194,13 @@ describe("App", () => {
   });
 
   it("loads globalSettings from chrome.storage", () => {
-    storageMock.globalSettings = { bulletList: false, linkNameOnly: false };
+    storageMock.globalSettings = { bulletList: true, bulletStyle: 'ul', bulletChar: '* ', linkNameOnly: false };
 
     render(<App />);
 
     const toggles = document.querySelectorAll<HTMLInputElement>(".global-settings .toggle-input");
+    // toggles[0] = linkNameOnly, toggles[1] = bulletList
     expect(toggles[0].checked).toBe(false);
-    expect(toggles[1].checked).toBe(false);
+    expect(toggles[1].checked).toBe(true);
   });
 });

@@ -93,7 +93,7 @@ describe("useChromeStorage", () => {
     });
 
     const [, globalSettings] = result.current;
-    expect(globalSettings).toEqual({ bulletList: false, linkNameOnly: false });
+    expect(globalSettings).toEqual({ bulletList: false, bulletStyle: 'custom', bulletChar: '- ', linkNameOnly: false });
   });
 
   it("removes listener on unmount", () => {

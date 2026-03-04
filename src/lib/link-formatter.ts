@@ -91,17 +91,31 @@ export function formatTemplateLink(
   };
 }
 
-export function joinLinks(links: LinkResult[], bulletList: boolean): LinkResult {
+export interface BulletConfig {
+  enabled: boolean;
+  style: 'ul' | 'custom';
+  char: string;
+}
+
+export function joinLinks(links: LinkResult[], bullet: BulletConfig): LinkResult {
   if (links.length === 1) return links[0];
-  if (bulletList) {
+  if (!bullet.enabled) {
     return {
-      html: "<ul>" + links.map((l) => `<li>${l.html}</li>`).join("") + "</ul>",
+      html: links.map((l) => `<div>${l.html}</div>`).join(""),
+      plain: links.map((l) => l.plain).join("\n"),
+    };
+  }
+  if (bullet.style === 'ul') {
+    return {
+      html: '<meta charset="utf-8"><div><ul>' + links.map((l) => `<li>${l.html}</li>`).join("") + "</ul></div>",
       plain: links.map((l) => `- ${l.plain}`).join("\n"),
     };
   }
+  // custom style
+  const ch = bullet.char;
   return {
-    html: links.map((l) => l.html).join("<br>"),
-    plain: links.map((l) => l.plain).join("\n"),
+    html: links.map((l) => `<div>${escapeHtml(ch)}${l.html}</div>`).join(""),
+    plain: links.map((l) => `${ch}${l.plain}`).join("\n"),
   };
 }
 

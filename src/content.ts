@@ -184,7 +184,7 @@ chrome.storage.sync.get(
   { objectSettings: {}, globalSettings: DEFAULT_GLOBAL_SETTINGS },
   (result) => {
     cachedSettings = result.objectSettings as ObjectSettings;
-    cachedGlobalSettings = result.globalSettings as GlobalSettings;
+    cachedGlobalSettings = { ...DEFAULT_GLOBAL_SETTINGS, ...(result.globalSettings as GlobalSettings) };
   },
 );
 chrome.storage.onChanged.addListener((changes) => {
@@ -192,6 +192,6 @@ chrome.storage.onChanged.addListener((changes) => {
     cachedSettings = changes.objectSettings.newValue as ObjectSettings;
   }
   if (changes.globalSettings) {
-    cachedGlobalSettings = changes.globalSettings.newValue as GlobalSettings;
+    cachedGlobalSettings = { ...DEFAULT_GLOBAL_SETTINGS, ...(changes.globalSettings.newValue as GlobalSettings) };
   }
 });

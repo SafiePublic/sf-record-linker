@@ -65,11 +65,16 @@ chrome.action.onClicked.addListener(async (tab) => {
       return;
     }
 
-    const { globalSettings } = await chrome.storage.sync.get({
+    const stored = await chrome.storage.sync.get({
       globalSettings: DEFAULT_GLOBAL_SETTINGS,
     }) as { globalSettings: GlobalSettings };
+    const globalSettings = { ...DEFAULT_GLOBAL_SETTINGS, ...stored.globalSettings };
 
-    const { html, plain } = joinLinks(links, globalSettings.bulletList);
+    const { html, plain } = joinLinks(links, {
+      enabled: globalSettings.bulletList,
+      style: globalSettings.bulletStyle,
+      char: globalSettings.bulletChar,
+    });
 
     const response = await chrome.tabs.sendMessage(tab.id, {
       action: "copyToClipboard",

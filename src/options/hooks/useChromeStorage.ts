@@ -17,7 +17,7 @@ export function useChromeStorage(): [
       { objectSettings: {}, globalSettings: DEFAULT_GLOBAL_SETTINGS },
       (result) => {
         setSettings(result.objectSettings as ObjectSettings);
-        setGlobalSettings(result.globalSettings as GlobalSettings);
+        setGlobalSettings({ ...DEFAULT_GLOBAL_SETTINGS, ...(result.globalSettings as GlobalSettings) });
       },
     );
 
@@ -26,7 +26,7 @@ export function useChromeStorage(): [
         setSettings(changes.objectSettings.newValue as ObjectSettings);
       }
       if (changes.globalSettings) {
-        setGlobalSettings(changes.globalSettings.newValue as GlobalSettings);
+        setGlobalSettings({ ...DEFAULT_GLOBAL_SETTINGS, ...(changes.globalSettings.newValue as GlobalSettings) });
       }
     };
     chrome.storage.onChanged.addListener(listener);
