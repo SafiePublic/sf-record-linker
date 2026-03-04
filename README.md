@@ -2,6 +2,14 @@
 
 Salesforce Lightning レコードページ用 Chrome 拡張機能。レコードへのリンクをワンクリックでクリップボードにコピーする。
 
+## 使い方
+
+1. Salesforce Lightning のレコードページを開く
+2. 拡張アイコンをクリック
+3. レコード名のリンクがクリップボードにコピーされる（リッチテキスト + プレーンテキスト）
+
+設定画面でオブジェクトごとに項目ラベルを指定すると、`レコード名(項目値)` の拡張形式でコピーできる。
+
 ## セットアップ
 
 ```bash
@@ -28,10 +36,12 @@ npm run typecheck # 型チェック
 ```
 sf-record-linker/
 ├── src/
-│   ├── content.ts             # Content Script（DOM操作・UI挿入）
+│   ├── content.ts             # Content Script（メッセージ受信・DOM探索・クリップボードコピー）
+│   ├── background.ts          # Service Worker（アイコンクリック・declarativeContent）
 │   ├── options.ts             # 設定画面ロジック
 │   └── lib/
-│       └── link-formatter.ts  # リンク生成ロジック
+│       ├── link-formatter.ts  # リンク生成ロジック
+│       └── types.ts           # 共有型定義
 ├── tests/
 │   └── lib/
 │       └── link-formatter.test.ts
@@ -54,7 +64,7 @@ sf-record-linker/
 - Chrome Extension Manifest V3
 - TypeScript + esbuild（IIFE バンドル）
 - Vitest（テスト）
+- Service Worker + declarativeContent — レコードページでのみアイコン有効化
 - Content Script（`*://*.lightning.force.com/*` で動作）
 - Clipboard API — text/html + text/plain 両方をセット
-- MutationObserver — SPA ページ遷移検知・再挿入
 - chrome.storage.sync — オブジェクトごとの拡張表示設定

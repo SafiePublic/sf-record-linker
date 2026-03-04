@@ -15,7 +15,6 @@
   "permissions": [
     "clipboardWrite",
     "storage",
-    "activeTab",
     "declarativeContent"
   ],
   "options_page": "options.html",

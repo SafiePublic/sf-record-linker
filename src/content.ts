@@ -1,4 +1,5 @@
 import { formatBasicLink, formatExtendedLink } from "./lib/link-formatter";
+import type { ObjectSettings } from "./lib/types";
 
 function querySelectorInShadowDOM(
   root: Document | ShadowRoot | Element,
@@ -23,19 +24,9 @@ function querySelectorInShadowDOM(
   return null;
 }
 
-interface ObjectSetting {
-  enabled: boolean;
-  fieldLabel: string;
-  showLabel: boolean;
-}
-
-interface ObjectSettings {
-  [key: string]: ObjectSetting;
-}
-
-function findRecordNameElement(): HTMLElement | null {
-  const startEl =
-    document.querySelector("one-record-home-flexipage2") || document;
+function findRecordNameElement(
+  startEl: Element | Document,
+): HTMLElement | null {
   const rh2 = querySelectorInShadowDOM(startEl, "records-highlights2");
   if (!rh2) return null;
 
@@ -51,9 +42,7 @@ function findRecordNameElement(): HTMLElement | null {
   return null;
 }
 
-function getObjectLabel(): string | null {
-  const startEl =
-    document.querySelector("one-record-home-flexipage2") || document;
+function getObjectLabel(startEl: Element | Document): string | null {
   const el =
     querySelectorInShadowDOM(startEl, "records-entity-label") ||
     querySelectorInShadowDOM(startEl, ".entityNameTitle");
@@ -61,9 +50,10 @@ function getObjectLabel(): string | null {
   return el.innerText?.trim() || null;
 }
 
-function getFieldValue(fieldLabel: string): string | null {
-  const startEl =
-    document.querySelector("one-record-home-flexipage2") || document;
+function getFieldValue(
+  startEl: Element | Document,
+  fieldLabel: string,
+): string | null {
   const item = querySelectorInShadowDOM(
     startEl,
     `records-record-layout-item[field-label="${fieldLabel}"]`,
@@ -83,6 +73,33 @@ function getFieldValue(fieldLabel: string): string | null {
   return output.innerText?.trim() || null;
 }
 
+function buildLink(
+  recordName: string,
+  url: string,
+  startEl: Element | Document,
+): { html: string; plain: string } {
+  try {
+    const objectLabel = getObjectLabel(startEl);
+    const setting = objectLabel ? cachedSettings[objectLabel] : undefined;
+
+    if (setting?.enabled && setting.fieldLabel) {
+      const fieldValue = getFieldValue(startEl, setting.fieldLabel);
+      if (fieldValue) {
+        return formatExtendedLink(
+          recordName,
+          url,
+          setting.fieldLabel,
+          fieldValue,
+          setting.showLabel,
+        );
+      }
+    }
+  } catch {
+    // フォールバック: 基本リンク
+  }
+  return formatBasicLink(recordName, url);
+}
+
 let cachedSettings: ObjectSettings = {};
 
 function isRecordPage(): boolean {
@@ -92,38 +109,15 @@ function isRecordPage(): boolean {
 async function copyRecordLink(): Promise<{ success: boolean }> {
   if (!isRecordPage()) return { success: false };
 
-  const nameEl = findRecordNameElement();
+  const startEl =
+    document.querySelector("one-record-home-flexipage2") || document;
+
+  const nameEl = findRecordNameElement(startEl);
   if (!nameEl) return { success: false };
 
   const recordName = nameEl.innerText.trim();
   const url = window.location.href;
-
-  let html: string;
-  let plain: string;
-
-  try {
-    const objectLabel = getObjectLabel();
-    const setting = objectLabel ? cachedSettings[objectLabel] : undefined;
-
-    if (setting?.enabled && setting.fieldLabel) {
-      const fieldValue = getFieldValue(setting.fieldLabel);
-      if (fieldValue) {
-        ({ html, plain } = formatExtendedLink(
-          recordName,
-          url,
-          setting.fieldLabel,
-          fieldValue,
-          setting.showLabel,
-        ));
-      } else {
-        ({ html, plain } = formatBasicLink(recordName, url));
-      }
-    } else {
-      ({ html, plain } = formatBasicLink(recordName, url));
-    }
-  } catch {
-    ({ html, plain } = formatBasicLink(recordName, url));
-  }
+  const { html, plain } = buildLink(recordName, url, startEl);
 
   try {
     const clipboardItem = new ClipboardItem({

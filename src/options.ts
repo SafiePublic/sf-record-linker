@@ -1,12 +1,4 @@
-interface ObjectSettingValue {
-  enabled: boolean;
-  fieldLabel: string;
-  showLabel: boolean;
-}
-
-interface ObjectSettings {
-  [key: string]: ObjectSettingValue;
-}
+import type { ObjectSettings } from "./lib/types";
 
 class SettingsManager {
   #container: HTMLElement;
