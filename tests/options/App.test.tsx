@@ -12,6 +12,8 @@ const storageMock = {
 
 const changeListeners: Array<(changes: Record<string, unknown>) => void> = [];
 
+const localStorageMock: Record<string, unknown> = {};
+
 const chromeMock = {
   storage: {
     sync: {
@@ -20,6 +22,14 @@ const chromeMock = {
       }),
       set: vi.fn((_data: unknown, cb: () => void) => {
         cb();
+      }),
+    },
+    local: {
+      get: vi.fn((defaults: Record<string, unknown>, cb: (result: Record<string, unknown>) => void) => {
+        cb({ ...defaults, ...localStorageMock });
+      }),
+      set: vi.fn((data: Record<string, unknown>) => {
+        Object.assign(localStorageMock, data);
       }),
     },
     onChanged: {
@@ -43,6 +53,8 @@ beforeEach(() => {
   changeListeners.length = 0;
   storageMock.objectSettings = {};
   storageMock.globalSettings = { ...DEFAULT_GLOBAL_SETTINGS };
+  // Reset local storage mock
+  for (const key of Object.keys(localStorageMock)) delete localStorageMock[key];
   cleanup();
 });
 
@@ -205,5 +217,73 @@ describe("App", () => {
     expect(toggles[0].checked).toBe(false);
     expect(toggles[1].checked).toBe(true);
     expect(toggles[2].checked).toBe(true);
+  });
+
+  describe("view toggle", () => {
+    it("does not show view toggle when no cards exist", () => {
+      render(<App />);
+      expect(document.querySelector(".view-toggle")).toBeNull();
+    });
+
+    it("shows view toggle when cards exist", () => {
+      render(<App />);
+      fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
+      expect(document.querySelector(".view-toggle")).toBeTruthy();
+    });
+
+    it("defaults to card view", () => {
+      render(<App />);
+      fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
+      expect(document.querySelectorAll(".card-header-label")).toHaveLength(1);
+      expect(document.querySelector(".object-list")).toBeNull();
+    });
+
+    it("switches to list view", () => {
+      render(<App />);
+      fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
+
+      fireEvent.click(screen.getByText("リスト"));
+      expect(document.querySelector(".object-list")).toBeTruthy();
+      expect(document.querySelectorAll(".card-header-label")).toHaveLength(0);
+    });
+
+    it("switches back to card view", () => {
+      render(<App />);
+      fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
+
+      fireEvent.click(screen.getByText("リスト"));
+      fireEvent.click(screen.getByText("カード"));
+      expect(document.querySelectorAll(".card-header-label")).toHaveLength(1);
+      expect(document.querySelector(".object-list")).toBeNull();
+    });
+
+    it("persists view mode to chrome.storage.local", () => {
+      render(<App />);
+      fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
+
+      fireEvent.click(screen.getByText("リスト"));
+      expect(chromeMock.storage.local.set).toHaveBeenCalledWith({ viewMode: "list" });
+    });
+
+    it("restores view mode from chrome.storage.local", () => {
+      localStorageMock.viewMode = "list";
+
+      storageMock.objectSettings = {
+        "商品": { enabled: true, mode: "simple", fieldLabel: "商品コード", showLabel: true, format: "" },
+      };
+
+      render(<App />);
+      // Should be in list view
+      expect(document.querySelector(".object-list")).toBeTruthy();
+    });
+
+    it("hides view toggle when last card is removed", () => {
+      render(<App />);
+      fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
+      expect(document.querySelector(".view-toggle")).toBeTruthy();
+
+      fireEvent.click(screen.getByText("削除"));
+      expect(document.querySelector(".view-toggle")).toBeNull();
+    });
   });
 });

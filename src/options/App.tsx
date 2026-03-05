@@ -5,6 +5,8 @@ import { validateCards } from "../lib/validation";
 import { useChromeStorage } from "./hooks/useChromeStorage";
 import { useToast } from "./hooks/useToast";
 import { ObjectCard } from "./components/ObjectCard";
+import { ObjectList } from "./components/ObjectList";
+import { ViewToggle, type ViewMode } from "./components/ViewToggle";
 import { Toggle } from "./components/Toggle";
 import { Toast } from "./components/Toast";
 import { GlobalPreview } from "./components/Preview";
@@ -62,11 +64,34 @@ export function App() {
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
     ...DEFAULT_GLOBAL_SETTINGS,
   });
+  const [viewMode, setViewMode] = useState<ViewMode>("card");
   const [state, dispatch] = useReducer(reducer, {
     cards: [],
     errors: [],
     duplicateObjectNames: [],
   });
+
+  // chrome.storage.local からビュー設定を復元
+  useEffect(() => {
+    try {
+      chrome.storage.local.get({ viewMode: "card" }, (result) => {
+        if (result.viewMode === "card" || result.viewMode === "list") {
+          setViewMode(result.viewMode);
+        }
+      });
+    } catch {
+      // テスト環境等で chrome.storage.local が無い場合は無視
+    }
+  }, []);
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    try {
+      chrome.storage.local.set({ viewMode: mode });
+    } catch {
+      // テスト環境等で chrome.storage.local が無い場合は無視
+    }
+  };
 
   useEffect(() => {
     setGlobalSettings(storedGlobalSettings);
@@ -241,19 +266,37 @@ export function App() {
         />
       </div>
 
-      <div id="cards">
-        {state.cards.map((card) => (
-          <ObjectCard
-            key={card.id}
-            card={card}
-            errors={errorsForCard(card.id)}
-            linkNameOnly={globalSettings.linkNameOnly}
-            showObjectName={globalSettings.showObjectName}
-            onChange={(updated) => dispatch({ type: "update", card: updated })}
-            onRemove={() => dispatch({ type: "remove", id: card.id })}
-          />
-        ))}
-      </div>
+      {state.cards.length > 0 && (
+        <div class="section-header">
+          <span class="section-header-label">オブジェクト設定</span>
+          <ViewToggle mode={viewMode} onChange={handleViewModeChange} />
+        </div>
+      )}
+
+      {viewMode === "card" ? (
+        <div id="cards">
+          {state.cards.map((card) => (
+            <ObjectCard
+              key={card.id}
+              card={card}
+              errors={errorsForCard(card.id)}
+              linkNameOnly={globalSettings.linkNameOnly}
+              showObjectName={globalSettings.showObjectName}
+              onChange={(updated) => dispatch({ type: "update", card: updated })}
+              onRemove={() => dispatch({ type: "remove", id: card.id })}
+            />
+          ))}
+        </div>
+      ) : (
+        <ObjectList
+          cards={state.cards}
+          errors={state.errors}
+          linkNameOnly={globalSettings.linkNameOnly}
+          showObjectName={globalSettings.showObjectName}
+          onChange={(updated) => dispatch({ type: "update", card: updated })}
+          onRemove={(id) => dispatch({ type: "remove", id })}
+        />
+      )}
 
       <button class="btn-add" onClick={() => dispatch({ type: "add" })}>
         + オブジェクトごとの拡張設定を追加

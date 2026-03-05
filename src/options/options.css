@@ -377,3 +377,135 @@ body {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* ── セクションヘッダー ── */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-header-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── ビュー切り替えトグル ── */
+.view-toggle {
+  display: flex;
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.view-toggle-btn {
+  padding: 3px 10px;
+  border: none;
+  background: none;
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.view-toggle-btn.active {
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* ── リストビュー ── */
+.object-list {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.object-list-empty {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 20px;
+  margin-bottom: 14px;
+}
+
+.list-row {
+  border-bottom: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+
+.list-row:last-child {
+  border-bottom: none;
+}
+
+.list-row.error {
+  border-left: 3px solid var(--danger);
+}
+
+.list-row-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.15s;
+}
+
+.list-row-summary:hover {
+  background: var(--bg);
+}
+
+.list-row-chevron {
+  font-size: 10px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  width: 14px;
+}
+
+.list-row-name {
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+  min-width: 0;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mode-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg);
+  padding: 1px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.list-row-config {
+  font-size: 13px;
+  color: var(--text-secondary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list-row-detail {
+  padding: 12px 14px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
