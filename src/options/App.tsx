@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useState } from "preact/hooks";
+import { useReducer, useEffect, useState, useRef } from "preact/hooks";
 import type { CardState, ObjectSettings, GlobalSettings, ValidationError } from "../lib/types";
 import { DEFAULT_GLOBAL_SETTINGS } from "../lib/types";
 import { validateCards } from "../lib/validation";
@@ -7,6 +7,8 @@ import { useToast } from "./hooks/useToast";
 import { ObjectCard } from "./components/ObjectCard";
 import { Toggle } from "./components/Toggle";
 import { Toast } from "./components/Toast";
+import { GlobalPreview } from "./components/Preview";
+import { exportSettings, parseImportData } from "../lib/settings-io";
 
 type Action =
   | { type: "load"; cards: CardState[] }
@@ -121,6 +123,41 @@ export function App() {
     showToast("設定を保存しました");
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExport = () => {
+    const json = exportSettings(storedSettings, storedGlobalSettings);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sf-record-linker-settings.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportFile = async (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    const text = await file.text();
+    const result = parseImportData(text);
+    if (!result.success) {
+      showToast(result.error);
+      return;
+    }
+
+    await saveSettings(result.objectSettings, result.globalSettings);
+    showToast("設定をインポートしました");
+
+    // ファイル入力をリセット（同じファイルの再選択を許可）
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const errorsForCard = (id: string) =>
     state.errors.filter((e) => e.cardId === id);
 
@@ -129,20 +166,30 @@ export function App() {
       <div class="page-header">
         <div class="page-header-row">
           <h1>SF Record Linker 設定</h1>
-          <button class="btn-save" onClick={handleSave}>
-            保存
-          </button>
+          <div class="header-actions">
+            <button class="btn-secondary" onClick={handleExport}>エクスポート</button>
+            <button class="btn-secondary" onClick={handleImportClick}>インポート</button>
+            <input type="file" accept=".json" style={{ display: 'none' }} ref={fileInputRef} onChange={handleImportFile} />
+            <button class="btn-save" onClick={handleSave}>保存</button>
+          </div>
         </div>
         <p>オブジェクトごとにリンクテキストに含める項目を設定します。</p>
       </div>
 
       <div class="global-settings">
-        <div class="global-settings-heading">全体設定</div>
+        <div class="global-settings-heading">基本設定</div>
         <Toggle
           label="レコード名のみリンクにする"
           checked={globalSettings.linkNameOnly}
           onChange={(linkNameOnly) =>
             setGlobalSettings((prev) => ({ ...prev, linkNameOnly }))
+          }
+        />
+        <Toggle
+          label="オブジェクト名を出力する"
+          checked={globalSettings.showObjectName}
+          onChange={(showObjectName) =>
+            setGlobalSettings((prev) => ({ ...prev, showObjectName }))
           }
         />
         <Toggle
@@ -186,6 +233,12 @@ export function App() {
             )}
           </>
         )}
+        <GlobalPreview
+          showObjectName={globalSettings.showObjectName}
+          bulletList={globalSettings.bulletList}
+          bulletStyle={globalSettings.bulletStyle}
+          bulletChar={globalSettings.bulletChar}
+        />
       </div>
 
       <div id="cards">
@@ -195,6 +248,7 @@ export function App() {
             card={card}
             errors={errorsForCard(card.id)}
             linkNameOnly={globalSettings.linkNameOnly}
+            showObjectName={globalSettings.showObjectName}
             onChange={(updated) => dispatch({ type: "update", card: updated })}
             onRemove={() => dispatch({ type: "remove", id: card.id })}
           />
@@ -202,7 +256,7 @@ export function App() {
       </div>
 
       <button class="btn-add" onClick={() => dispatch({ type: "add" })}>
-        + オブジェクトを追加
+        + オブジェクトごとの拡張設定を追加
       </button>
 
       <Toast message={toastMessage} visible={toastVisible} />

@@ -1,6 +1,10 @@
 import type { CardState } from "../../lib/types";
 
-function computePreviewParts(card: CardState, linkNameOnly: boolean): { before: string; linked: string; after: string } {
+function computePreviewParts(
+  card: CardState,
+  linkNameOnly: boolean,
+  showObjectName: boolean,
+): { before: string; linked: string; after: string } {
   const objectName = card.objectName.trim() || "オブジェクト名";
 
   if (card.mode === "custom") {
@@ -30,20 +34,73 @@ function computePreviewParts(card: CardState, linkNameOnly: boolean): { before: 
   // simple mode
   const label = card.fieldLabel.trim() || "ラベル";
   const suffix = card.showLabel ? `(${label}:値)` : "(値)";
+  const prefix = showObjectName ? `${objectName}: ` : "";
 
   if (linkNameOnly) {
-    return { before: "", linked: "レコード名", after: suffix };
+    return { before: prefix, linked: "レコード名", after: suffix };
   }
-  return { before: "", linked: `レコード名${suffix}`, after: "" };
+  return { before: prefix, linked: `レコード名${suffix}`, after: "" };
+}
+
+interface GlobalPreviewProps {
+  showObjectName: boolean;
+  bulletList: boolean;
+  bulletStyle: "ul" | "custom";
+  bulletChar: string;
+}
+
+export function GlobalPreview({ showObjectName, bulletList, bulletStyle, bulletChar }: GlobalPreviewProps) {
+  const prefix = showObjectName ? "オブジェクト名: " : "";
+  const line = (
+    <>
+      {prefix && <span>{prefix}</span>}
+      <u>レコード名</u>
+    </>
+  );
+
+  if (!bulletList) {
+    return (
+      <div class="preview">
+        <div class="preview-heading">プレビュー</div>
+        <div class="preview-text">{line}</div>
+      </div>
+    );
+  }
+
+  if (bulletStyle === "ul") {
+    return (
+      <div class="preview">
+        <div class="preview-heading">プレビュー</div>
+        <ul class="preview-list">
+          <li class="preview-text">{line}</li>
+          <li class="preview-text">{line}</li>
+        </ul>
+      </div>
+    );
+  }
+
+  // custom bullet
+  return (
+    <div class="preview">
+      <div class="preview-heading">プレビュー</div>
+      <div class="preview-text">
+        <span>{bulletChar}</span>{line}
+      </div>
+      <div class="preview-text">
+        <span>{bulletChar}</span>{line}
+      </div>
+    </div>
+  );
 }
 
 interface PreviewProps {
   card: CardState;
   linkNameOnly: boolean;
+  showObjectName: boolean;
 }
 
-export function Preview({ card, linkNameOnly }: PreviewProps) {
-  const { before, linked, after } = computePreviewParts(card, linkNameOnly);
+export function Preview({ card, linkNameOnly, showObjectName }: PreviewProps) {
+  const { before, linked, after } = computePreviewParts(card, linkNameOnly, showObjectName);
   return (
     <div class="preview">
       <div class="preview-heading">プレビュー</div>

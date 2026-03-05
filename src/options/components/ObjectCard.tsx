@@ -7,11 +7,12 @@ interface ObjectCardProps {
   card: CardState;
   errors: ValidationError[];
   linkNameOnly: boolean;
+  showObjectName: boolean;
   onChange: (card: CardState) => void;
   onRemove: () => void;
 }
 
-export function ObjectCard({ card, errors, linkNameOnly, onChange, onRemove }: ObjectCardProps) {
+export function ObjectCard({ card, errors, linkNameOnly, showObjectName, onChange, onRemove }: ObjectCardProps) {
   const hasError = errors.length > 0;
   const fieldError = (field: ValidationError["field"]) =>
     errors.some((e) => e.field === field);
@@ -23,7 +24,7 @@ export function ObjectCard({ card, errors, linkNameOnly, onChange, onRemove }: O
   return (
     <div class={`card${hasError ? " error" : ""}`}>
       <div class="card-header">
-        <span class="card-header-label">オブジェクト設定</span>
+        <span class="card-header-label">オブジェクトごとの拡張設定</span>
         <button class="btn-remove" onClick={onRemove}>
           削除
         </button>
@@ -55,7 +56,7 @@ export function ObjectCard({ card, errors, linkNameOnly, onChange, onRemove }: O
         </div>
 
         <Toggle
-          label="項目ラベル名を表示する"
+          label="項目ラベル名を出力する"
           checked={card.showLabel}
           onChange={(showLabel) => update({ showLabel })}
         />
@@ -79,7 +80,7 @@ export function ObjectCard({ card, errors, linkNameOnly, onChange, onRemove }: O
         </div>
       </div>
 
-      <Preview card={card} linkNameOnly={linkNameOnly} />
+      <Preview card={card} linkNameOnly={linkNameOnly} showObjectName={showObjectName} />
     </div>
   );
 }

@@ -91,6 +91,19 @@ export function formatTemplateLink(
   };
 }
 
+export function prefixObjectName(
+  link: LinkResult,
+  objectLabel: string,
+  showObjectName: boolean,
+): LinkResult {
+  if (!showObjectName || !objectLabel) return link;
+  const prefix = `${objectLabel}: `;
+  return {
+    html: `${escapeHtml(prefix)}${link.html}`,
+    plain: `${prefix}${link.plain}`,
+  };
+}
+
 export interface BulletConfig {
   enabled: boolean;
   style: 'ul' | 'custom';

@@ -55,34 +55,34 @@ describe("App", () => {
 
   it("renders global settings section", () => {
     render(<App />);
-    expect(screen.getByText("全体設定")).toBeTruthy();
+    expect(screen.getByText("基本設定")).toBeTruthy();
     expect(screen.getByText("複数タブ時に箇条書きでコピー")).toBeTruthy();
     expect(screen.getByText("レコード名のみリンクにする")).toBeTruthy();
   });
 
   it("starts with no cards", () => {
     render(<App />);
-    expect(screen.queryAllByText("オブジェクト設定")).toHaveLength(0);
+    expect(document.querySelectorAll(".card-header-label")).toHaveLength(0);
   });
 
   it("adds a card when clicking the add button", async () => {
     render(<App />);
-    fireEvent.click(screen.getByText("+ オブジェクトを追加"));
-    expect(screen.getAllByText("オブジェクト設定")).toHaveLength(1);
+    fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
+    expect(document.querySelectorAll(".card-header-label")).toHaveLength(1);
   });
 
   it("removes a card when clicking delete", async () => {
     render(<App />);
-    fireEvent.click(screen.getByText("+ オブジェクトを追加"));
-    expect(screen.getAllByText("オブジェクト設定")).toHaveLength(1);
+    fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
+    expect(document.querySelectorAll(".card-header-label")).toHaveLength(1);
 
     fireEvent.click(screen.getByText("削除"));
-    expect(screen.queryAllByText("オブジェクト設定")).toHaveLength(0);
+    expect(document.querySelectorAll(".card-header-label")).toHaveLength(0);
   });
 
   it("shows validation error when saving empty card", async () => {
     render(<App />);
-    fireEvent.click(screen.getByText("+ オブジェクトを追加"));
+    fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
     fireEvent.click(screen.getByText("保存"));
 
     await waitFor(() => {
@@ -92,7 +92,7 @@ describe("App", () => {
 
   it("saves valid settings with globalSettings to chrome.storage", async () => {
     render(<App />);
-    fireEvent.click(screen.getByText("+ オブジェクトを追加"));
+    fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
 
     const inputs = document.querySelectorAll<HTMLInputElement>(".input-field");
     // Per card: objectName=0, fieldLabel=1, format=2
@@ -118,6 +118,7 @@ describe("App", () => {
             bulletStyle: 'custom',
             bulletChar: '- ',
             linkNameOnly: true,
+            showObjectName: false,
           },
         },
         expect.any(Function),
@@ -148,8 +149,8 @@ describe("App", () => {
 
   it("shows duplicate error when two cards have same object name", async () => {
     render(<App />);
-    fireEvent.click(screen.getByText("+ オブジェクトを追加"));
-    fireEvent.click(screen.getByText("+ オブジェクトを追加"));
+    fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
+    fireEvent.click(screen.getByText("+ オブジェクトごとの拡張設定を追加"));
 
     // Per card: objectName, fieldLabel, format (3 inputs each)
     // Card 1: 0,1,2 — Card 2: 3,4,5
@@ -172,9 +173,9 @@ describe("App", () => {
   it("saves toggled globalSettings", async () => {
     render(<App />);
 
-    // Toggle bulletList on (第2トグル、デフォルトはfalse)
+    // Toggle bulletList on (第3トグル、デフォルトはfalse)
     const toggles = document.querySelectorAll<HTMLInputElement>(".global-settings .toggle-input");
-    fireEvent.change(toggles[1], { target: { checked: true } });
+    fireEvent.change(toggles[2], { target: { checked: true } });
 
     fireEvent.click(screen.getByText("保存"));
 
@@ -186,6 +187,7 @@ describe("App", () => {
             bulletStyle: 'custom',
             bulletChar: '- ',
             linkNameOnly: true,
+            showObjectName: false,
           },
         }),
         expect.any(Function),
@@ -194,13 +196,14 @@ describe("App", () => {
   });
 
   it("loads globalSettings from chrome.storage", () => {
-    storageMock.globalSettings = { bulletList: true, bulletStyle: 'ul', bulletChar: '* ', linkNameOnly: false };
+    storageMock.globalSettings = { bulletList: true, bulletStyle: 'ul', bulletChar: '* ', linkNameOnly: false, showObjectName: true };
 
     render(<App />);
 
     const toggles = document.querySelectorAll<HTMLInputElement>(".global-settings .toggle-input");
-    // toggles[0] = linkNameOnly, toggles[1] = bulletList
+    // toggles[0] = linkNameOnly, toggles[1] = showObjectName, toggles[2] = bulletList
     expect(toggles[0].checked).toBe(false);
     expect(toggles[1].checked).toBe(true);
+    expect(toggles[2].checked).toBe(true);
   });
 });

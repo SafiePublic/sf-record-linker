@@ -37,6 +37,7 @@ export interface GlobalSettings {
   bulletStyle: 'ul' | 'custom';
   bulletChar: string;
   linkNameOnly: boolean;
+  showObjectName: boolean;
 }
 
 export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
@@ -44,4 +45,5 @@ export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
   bulletStyle: 'custom',
   bulletChar: '- ',
   linkNameOnly: true,
+  showObjectName: false,
 };

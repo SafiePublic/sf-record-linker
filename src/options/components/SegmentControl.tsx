@@ -11,14 +11,14 @@ export function SegmentControl({ mode, onChange }: SegmentControlProps) {
         class={`segment-btn${mode === "simple" ? " active" : ""}`}
         onClick={() => onChange("simple")}
       >
-        簡易設定
+        簡易フォーマット
       </button>
       <button
         type="button"
         class={`segment-btn${mode === "custom" ? " active" : ""}`}
         onClick={() => onChange("custom")}
       >
-        カスタム設定
+        カスタムフォーマット
       </button>
     </div>
   );

@@ -6,6 +6,7 @@ import {
   extractFieldLabels,
   escapeHtml,
   joinLinks,
+  prefixObjectName,
 } from "../../src/lib/link-formatter";
 
 describe("escapeHtml", () => {
@@ -274,6 +275,32 @@ describe("formatTemplateLink", () => {
       '<a href="https://example.com">Rec</a> - <a href="https://example.com">Rec</a>',
     );
     expect(result.plain).toBe("Rec - Rec");
+  });
+});
+
+describe("prefixObjectName", () => {
+  const link = { html: '<a href="https://example.com">Record</a>', plain: "Record" };
+
+  it("prepends object label when showObjectName is true", () => {
+    const result = prefixObjectName(link, "取引先", true);
+    expect(result.html).toBe('取引先: <a href="https://example.com">Record</a>');
+    expect(result.plain).toBe("取引先: Record");
+  });
+
+  it("returns link unchanged when showObjectName is false", () => {
+    const result = prefixObjectName(link, "取引先", false);
+    expect(result).toEqual(link);
+  });
+
+  it("returns link unchanged when objectLabel is empty", () => {
+    const result = prefixObjectName(link, "", true);
+    expect(result).toEqual(link);
+  });
+
+  it("escapes HTML in object label", () => {
+    const result = prefixObjectName(link, "R&D", true);
+    expect(result.html).toBe('R&amp;D: <a href="https://example.com">Record</a>');
+    expect(result.plain).toBe("R&D: Record");
   });
 });
 
