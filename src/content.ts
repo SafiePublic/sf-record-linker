@@ -3,6 +3,7 @@ import {
   formatExtendedLink,
   formatTemplateLink,
   extractFieldLabels,
+  prefixObjectName,
 } from "./lib/link-formatter";
 import type { ObjectSettings, GlobalSettings } from "./lib/types";
 import { DEFAULT_GLOBAL_SETTINGS } from "./lib/types";
@@ -87,8 +88,11 @@ function buildLink(
   try {
     const objectLabel = getObjectLabel(startEl);
     const setting = objectLabel ? cachedSettings[objectLabel] : undefined;
+    const showObjectName = cachedGlobalSettings.showObjectName;
 
-    if (!setting?.enabled) return formatBasicLink(recordName, url);
+    if (!setting?.enabled) {
+      return prefixObjectName(formatBasicLink(recordName, url), objectLabel ?? '', showObjectName);
+    }
 
     const linkNameOnly = cachedGlobalSettings.linkNameOnly;
     const mode = setting.mode ?? 'simple';
@@ -98,9 +102,10 @@ function buildLink(
       const fieldValues: Record<string, string> = {};
       for (const label of labels) {
         const val = getFieldValue(startEl, label);
-        if (!val) return formatBasicLink(recordName, url);
+        if (!val) return prefixObjectName(formatBasicLink(recordName, url), objectLabel ?? '', showObjectName);
         fieldValues[label] = val;
       }
+      // カスタムモードでは showObjectName を適用しない
       return formatTemplateLink(
         recordName,
         url,
@@ -114,13 +119,17 @@ function buildLink(
     if (setting.fieldLabel) {
       const fieldValue = getFieldValue(startEl, setting.fieldLabel);
       if (fieldValue) {
-        return formatExtendedLink(
-          recordName,
-          url,
-          setting.fieldLabel,
-          fieldValue,
-          setting.showLabel,
-          linkNameOnly,
+        return prefixObjectName(
+          formatExtendedLink(
+            recordName,
+            url,
+            setting.fieldLabel,
+            fieldValue,
+            setting.showLabel,
+            linkNameOnly,
+          ),
+          objectLabel ?? '',
+          showObjectName,
         );
       }
     }
@@ -133,12 +142,43 @@ function buildLink(
 let cachedSettings: ObjectSettings = {};
 let cachedGlobalSettings: GlobalSettings = { ...DEFAULT_GLOBAL_SETTINGS };
 
-function isRecordPage(): boolean {
-  return /\/lightning\/r\/[^/]+\/[^/]+\/view/.test(window.location.pathname);
+type PageType = 'record' | 'report' | 'unknown';
+
+function detectPageType(): PageType {
+  const path = window.location.pathname;
+  if (/\/lightning\/r\/Report\/[^/]+\/view/.test(path)) return 'report';
+  if (/\/lightning\/r\/[^/]+\/[^/]+\/view/.test(path)) return 'record';
+  return 'unknown';
+}
+
+function findReportName(): string | null {
+  // DOM から取得（優先）
+  const titleEl = document.querySelector<HTMLElement>('.slds-page-header__title');
+  if (titleEl) {
+    const name = titleEl.innerText?.trim();
+    if (name) return name;
+  }
+
+  // フォールバック: document.title
+  const title = document.title;
+  if (title?.includes(' | Salesforce')) {
+    const name = title.replace(/ \| Salesforce$/, '').trim();
+    if (name) return name;
+  }
+  return title?.trim() || null;
 }
 
 function getRecordLink(): { success: boolean; html?: string; plain?: string } {
-  if (!isRecordPage()) return { success: false };
+  const pageType = detectPageType();
+  if (pageType === 'unknown') return { success: false };
+
+  if (pageType === 'report') {
+    const name = findReportName();
+    if (!name) return { success: false };
+    const link = formatBasicLink(name, window.location.href);
+    const result = prefixObjectName(link, 'レポート', cachedGlobalSettings.showObjectName);
+    return { success: true, ...result };
+  }
 
   const startEl =
     document.querySelector("one-record-home-flexipage2") || document;
