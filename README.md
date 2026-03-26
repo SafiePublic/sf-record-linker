@@ -1,8 +1,9 @@
 # SF Record Linker
 
-A Chrome extension for Salesforce Lightning that copies record page links to your clipboard with a single click. Supports custom formatting, multi-tab bulk copy, and per-object field configuration.
+🧪 「Claude Code で Chrome 拡張を手軽に作れないかな」とお試しで作ってみた拡張機能です。
+A Chrome extension casually built to see how easily [Claude Code](https://claude.ai/code) can handle it.
 
-Salesforce Lightning レコードページ用 Chrome 拡張機能。レコードへのリンクをワンクリックでクリップボードにコピーする。
+Salesforce Lightning レコードページのリンクをワンクリックでクリップボードにコピーします。カスタムフォーマット、複数タブ一括コピー、オブジェクトごとの項目設定に対応。
 
 > **Language / 言語**: This extension supports Japanese and English. The UI language follows your Chrome language setting.
 > 日本語と英語に対応しています。Chrome の言語設定に応じて自動的に切り替わります。

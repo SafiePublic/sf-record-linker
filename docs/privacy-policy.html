@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — SF Record Linker</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      line-height: 1.7;
+      color: #333;
+    }
+    h1 { font-size: 1.6rem; border-bottom: 2px solid #0070d2; padding-bottom: 0.5rem; }
+    h2 { font-size: 1.2rem; margin-top: 2rem; }
+    .lang-toggle { text-align: right; margin-bottom: 1rem; }
+    .lang-toggle a { color: #0070d2; cursor: pointer; text-decoration: underline; }
+    .section-en { display: none; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ddd; padding: 0.5rem 0.75rem; text-align: left; }
+    th { background: #f5f5f5; }
+    .last-updated { color: #666; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="lang-toggle">
+    <a onclick="toggleLang()">English / 日本語</a>
+  </div>
+
+  <!-- Japanese -->
+  <div class="section-ja">
+    <h1>プライバシーポリシー — SF Record Linker</h1>
+    <p class="last-updated">最終更新日: 2026年3月26日</p>
+
+    <h2>はじめに</h2>
+    <p>SF Record Linker（以下「本拡張機能」）は、Salesforce Lightning のレコードページからリンクをクリップボードにコピーするための Chrome 拡張機能です。本プライバシーポリシーでは、本拡張機能がユーザーのデータをどのように取り扱うかを説明します。</p>
+
+    <h2>収集するデータ</h2>
+    <p><strong>本拡張機能はユーザーの個人情報を一切収集しません。</strong></p>
+    <p>本拡張機能が扱うデータは以下の通りです:</p>
+    <table>
+      <tr><th>データ</th><th>用途</th><th>保存先</th></tr>
+      <tr><td>オブジェクト名・項目ラベル名などの設定情報</td><td>コピー形式のカスタマイズ</td><td><code>chrome.storage.sync</code>（ユーザーの Chrome プロファイルに紐づく同期ストレージ）</td></tr>
+      <tr><td>閲覧中の Salesforce レコードページの DOM 情報（レコード名・項目値）</td><td>リンクテキストの生成</td><td>メモリ上のみ（保存しない）</td></tr>
+    </table>
+
+    <h2>外部へのデータ送信</h2>
+    <p>本拡張機能は、いかなるデータも外部サーバーやサードパーティサービスに送信しません。すべての処理はユーザーのブラウザ内で完結します。</p>
+
+    <h2>権限の使用目的</h2>
+    <table>
+      <tr><th>権限</th><th>使用目的</th></tr>
+      <tr><td><code>clipboardWrite</code></td><td>生成したリンクをクリップボードにコピーするため</td></tr>
+      <tr><td><code>storage</code></td><td>ユーザーが設定したコピー形式を保存・同期するため</td></tr>
+      <tr><td><code>declarativeContent</code></td><td>Salesforce のレコードページでのみ拡張機能アイコンを有効化するため</td></tr>
+    </table>
+
+    <h2>ホスト権限</h2>
+    <p>本拡張機能は <code>*://*.lightning.force.com/*</code> にのみ content script を挿入します。これは Salesforce Lightning 環境のレコードページ情報を取得するために必要です。それ以外のウェブサイトでは一切動作しません。</p>
+
+    <h2>お問い合わせ</h2>
+    <p>本プライバシーポリシーに関するご質問は、<a href="https://github.com/s-kikuchi/sf-record-linker/issues">GitHub Issues</a> までお寄せください。</p>
+  </div>
+
+  <!-- English -->
+  <div class="section-en">
+    <h1>Privacy Policy — SF Record Linker</h1>
+    <p class="last-updated">Last updated: March 26, 2026</p>
+
+    <h2>Introduction</h2>
+    <p>SF Record Linker (the "Extension") is a Chrome extension that copies links from Salesforce Lightning record pages to the clipboard. This privacy policy explains how the Extension handles user data.</p>
+
+    <h2>Data Collection</h2>
+    <p><strong>This Extension does not collect any personal information.</strong></p>
+    <p>The Extension handles only the following data:</p>
+    <table>
+      <tr><th>Data</th><th>Purpose</th><th>Storage</th></tr>
+      <tr><td>Settings such as object names and field labels</td><td>Customizing copy format</td><td><code>chrome.storage.sync</code> (synced storage tied to the user's Chrome profile)</td></tr>
+      <tr><td>DOM data from the current Salesforce record page (record name, field values)</td><td>Generating link text</td><td>In-memory only (not persisted)</td></tr>
+    </table>
+
+    <h2>Data Transmission</h2>
+    <p>This Extension does not transmit any data to external servers or third-party services. All processing occurs entirely within the user's browser.</p>
+
+    <h2>Permissions</h2>
+    <table>
+      <tr><th>Permission</th><th>Purpose</th></tr>
+      <tr><td><code>clipboardWrite</code></td><td>To copy generated links to the clipboard</td></tr>
+      <tr><td><code>storage</code></td><td>To save and sync user-configured copy formats</td></tr>
+      <tr><td><code>declarativeContent</code></td><td>To enable the extension icon only on Salesforce record pages</td></tr>
+    </table>
+
+    <h2>Host Permissions</h2>
+    <p>This Extension injects a content script only into <code>*://*.lightning.force.com/*</code>. This is required to read record page information in the Salesforce Lightning environment. The Extension does not operate on any other websites.</p>
+
+    <h2>Contact</h2>
+    <p>For questions about this privacy policy, please open an issue on <a href="https://github.com/s-kikuchi/sf-record-linker/issues">GitHub Issues</a>.</p>
+  </div>
+
+  <script>
+    function toggleLang() {
+      const ja = document.querySelector('.section-ja');
+      const en = document.querySelector('.section-en');
+      if (ja.style.display === 'none') {
+        ja.style.display = '';
+        en.style.display = 'none';
+      } else {
+        ja.style.display = 'none';
+        en.style.display = '';
+      }
+    }
+  </script>
+</body>
+</html>
