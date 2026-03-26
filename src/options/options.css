@@ -277,14 +277,23 @@ body {
 }
 
 .preview-text {
-  color: var(--accent);
+  color: var(--text-primary);
   word-break: break-all;
+}
+
+.preview-text u {
+  color: var(--accent);
+}
+
+.preview-toast {
+  color: #c23934;
+  font-size: 0.85em;
 }
 
 .preview-list {
   margin: 0;
   padding-left: 20px;
-  color: var(--accent);
+  color: var(--text-primary);
   word-break: break-all;
 }
 
