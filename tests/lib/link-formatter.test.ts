@@ -302,6 +302,22 @@ describe("prefixObjectName", () => {
     expect(result.html).toBe('R&amp;D: <a href="https://example.com">Record</a>');
     expect(result.plain).toBe("R&D: Record");
   });
+
+  it("puts prefix outside link when linkNameOnly is true", () => {
+    const result = prefixObjectName(link, "取引先", true, true);
+    expect(result.html).toBe('取引先: <a href="https://example.com">Record</a>');
+  });
+
+  it("puts prefix inside link when linkNameOnly is false", () => {
+    const result = prefixObjectName(link, "取引先", true, false);
+    expect(result.html).toBe('<a href="https://example.com">取引先: Record</a>');
+    expect(result.plain).toBe("取引先: Record");
+  });
+
+  it("escapes HTML in object label inside link when linkNameOnly is false", () => {
+    const result = prefixObjectName(link, "R&D", true, false);
+    expect(result.html).toBe('<a href="https://example.com">R&amp;D: Record</a>');
+  });
 });
 
 describe("joinLinks", () => {

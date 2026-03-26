@@ -89,12 +89,12 @@ function buildLink(
     const objectLabel = getObjectLabel(startEl);
     const setting = objectLabel ? cachedSettings[objectLabel] : undefined;
     const showObjectName = cachedGlobalSettings.showObjectName;
+    const linkNameOnly = cachedGlobalSettings.linkNameOnly;
 
     if (!setting?.enabled) {
-      return prefixObjectName(formatBasicLink(recordName, url), objectLabel ?? '', showObjectName);
+      return prefixObjectName(formatBasicLink(recordName, url), objectLabel ?? '', showObjectName, linkNameOnly);
     }
 
-    const linkNameOnly = cachedGlobalSettings.linkNameOnly;
     const mode = setting.mode ?? 'simple';
 
     if (mode === 'custom' && setting.format) {
@@ -102,7 +102,7 @@ function buildLink(
       const fieldValues: Record<string, string> = {};
       for (const label of labels) {
         const val = getFieldValue(startEl, label);
-        if (!val) return prefixObjectName(formatBasicLink(recordName, url), objectLabel ?? '', showObjectName);
+        if (!val) return prefixObjectName(formatBasicLink(recordName, url), objectLabel ?? '', showObjectName, linkNameOnly);
         fieldValues[label] = val;
       }
       // カスタムモードでは showObjectName を適用しない
@@ -130,6 +130,7 @@ function buildLink(
           ),
           objectLabel ?? '',
           showObjectName,
+          linkNameOnly,
         );
       }
     }

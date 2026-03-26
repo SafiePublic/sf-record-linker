@@ -95,11 +95,19 @@ export function prefixObjectName(
   link: LinkResult,
   objectLabel: string,
   showObjectName: boolean,
+  linkNameOnly = true,
 ): LinkResult {
   if (!showObjectName || !objectLabel) return link;
   const prefix = `${objectLabel}: `;
+  if (linkNameOnly) {
+    return {
+      html: `${escapeHtml(prefix)}${link.html}`,
+      plain: `${prefix}${link.plain}`,
+    };
+  }
+  // linkNameOnly=false: プレフィックスもリンク内に含める
   return {
-    html: `${escapeHtml(prefix)}${link.html}`,
+    html: link.html.replace(/^<a ([^>]+)>/, `<a $1>${escapeHtml(prefix)}`),
     plain: `${prefix}${link.plain}`,
   };
 }
