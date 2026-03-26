@@ -6,7 +6,7 @@ function makeCard(overrides: Partial<CardState> = {}): CardState {
   return {
     id: "1",
     objectName: "商品",
-    alias: "",
+
     mode: "simple",
     fieldLabel: "商品コード",
     showLabel: true,

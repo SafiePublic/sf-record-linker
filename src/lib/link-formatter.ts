@@ -6,7 +6,7 @@ export interface LinkResult {
 export function formatBasicLink(recordName: string, url: string): LinkResult {
   const escaped = escapeHtml(recordName);
   return {
-    html: `<a href="${url}">${escaped}</a>`,
+    html: `<a href="${escapeHtml(url)}">${escaped}</a>`,
     plain: recordName,
   };
 }
@@ -28,14 +28,14 @@ export function formatExtendedLink(
     const escapedName = escapeHtml(recordName);
     const escapedSuffix = escapeHtml(suffix);
     return {
-      html: `<a href="${url}">${escapedName}</a>${escapedSuffix}`,
+      html: `<a href="${escapeHtml(url)}">${escapedName}</a>${escapedSuffix}`,
       plain: displayText,
     };
   }
 
   const escaped = escapeHtml(displayText);
   return {
-    html: `<a href="${url}">${escaped}</a>`,
+    html: `<a href="${escapeHtml(url)}">${escaped}</a>`,
     plain: displayText,
   };
 }
@@ -78,7 +78,7 @@ export function formatTemplateLink(
     // ${name} で分割して、各パートをエスケープしてリンク付き name で結合
     const parts = expandedFormat.split('${name}');
     const escapedName = escapeHtml(recordName);
-    const linkedName = `<a href="${url}">${escapedName}</a>`;
+    const linkedName = `<a href="${escapeHtml(url)}">${escapedName}</a>`;
     const html = parts.map(p => escapeHtml(p)).join(linkedName);
 
     return { html, plain: displayText };
@@ -86,7 +86,7 @@ export function formatTemplateLink(
 
   const escaped = escapeHtml(displayText);
   return {
-    html: `<a href="${url}">${escaped}</a>`,
+    html: `<a href="${escapeHtml(url)}">${escaped}</a>`,
     plain: displayText,
   };
 }
@@ -159,5 +159,6 @@ export function escapeHtml(str: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }

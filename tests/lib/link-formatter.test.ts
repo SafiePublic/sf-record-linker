@@ -30,6 +30,10 @@ describe("escapeHtml", () => {
   it("leaves normal text unchanged", () => {
     expect(escapeHtml("Hello World")).toBe("Hello World");
   });
+
+  it("escapes single quotes", () => {
+    expect(escapeHtml("it's")).toBe("it&#039;s");
+  });
 });
 
 describe("formatBasicLink", () => {
@@ -54,6 +58,13 @@ describe("formatBasicLink", () => {
   it("preserves raw record name in plain output", () => {
     const result = formatBasicLink("R&D <Team>", "https://example.com");
     expect(result.plain).toBe("R&D <Team>");
+  });
+
+  it("escapes special characters in url for html output", () => {
+    const result = formatBasicLink("Record", 'https://example.com/r?a=1&b="2"');
+    expect(result.html).toBe(
+      '<a href="https://example.com/r?a=1&amp;b=&quot;2&quot;">Record</a>',
+    );
   });
 });
 

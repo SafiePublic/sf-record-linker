@@ -57,13 +57,17 @@ function getObjectLabel(startEl: Element | Document): string | null {
   return el.innerText?.trim() || null;
 }
 
+function escapeCSSAttr(str: string): string {
+  return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
 function getFieldValue(
   startEl: Element | Document,
   fieldLabel: string,
 ): string | null {
   const item = querySelectorInShadowDOM(
     startEl,
-    `records-record-layout-item[field-label="${fieldLabel}"]`,
+    `records-record-layout-item[field-label="${escapeCSSAttr(fieldLabel)}"]`,
   );
   if (!item) return null;
 
