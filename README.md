@@ -143,3 +143,7 @@ sf-record-linker/
 - Content Script（`*://*.lightning.force.com/*` で動作）
 - Clipboard API — text/html + text/plain 両方をセット
 - chrome.storage.sync — オブジェクトごとの設定を同期
+
+## License
+
+[MIT License](LICENSE)
