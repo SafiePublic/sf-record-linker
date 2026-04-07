@@ -13,7 +13,7 @@
 |------|-----|
 | **ZIP パッケージ** | [最新リリースページ](https://github.com/SafiePublic/sf-record-linker/releases/latest) の Assets から `sf-record-linker.zip` をダウンロード |
 | **ストア掲載テキスト** | [docs/store-listing.md](https://github.com/SafiePublic/sf-record-linker/blob/main/docs/store-listing.md) |
-| **スクリーンショット** | [docs/screenshots/store-screenshot-options.png](https://github.com/SafiePublic/sf-record-linker/blob/main/docs/screenshots/store-screenshot-options.png) — 「Download raw file」ボタンでダウンロード |
+| **スクリーンショット** | [store-screenshot-options.png](https://github.com/SafiePublic/sf-record-linker/blob/main/docs/screenshots/store-screenshot-options.png) を開き、右上の「⬇ Download raw file」ボタンで PNG をダウンロード |
 | **プライバシーポリシー URL** | https://safiepublic.github.io/sf-record-linker/privacy-policy.html |
 | **リポジトリ URL**（ウェブサイト欄用） | https://github.com/SafiePublic/sf-record-linker |
 
@@ -40,7 +40,7 @@
 | 名前 | `SF Record Linker` |
 | 概要（短い説明） | store-listing.md →「概要（短い説明）」をコピー |
 | 詳細説明 | store-listing.md →「詳細説明」をコピー |
-| カテゴリ | 仕事効率化（Productivity） |
+| カテゴリ | ツール |
 | 言語 | 日本語（デフォルト）、English |
 | ウェブサイト | `https://github.com/SafiePublic/sf-record-linker` |
 | スクリーンショット | 上記の素材入手先からダウンロードした PNG をアップロード |
@@ -49,10 +49,18 @@
 
 | フィールド | 入力内容 |
 |-----------|---------|
-| シングルパーパス | `Salesforce Lightning レコードページのリンクをクリップボードにコピーする` |
+| 単一用途（シングルパーパス） | 下記の文章をコピー（この拡張機能が何をするものかを一文で説明する欄です） |
 | 権限の正当性 | 下記の文章をコピー |
+| ホスト権限が必要な理由 | 下記の文章をコピー |
+| リモートコードを使用していますか？ | 「いいえ」を選択 |
 | プライバシーポリシー URL | `https://safiepublic.github.io/sf-record-linker/privacy-policy.html` |
 | データの使用 | 「ユーザーのデータを収集または使用しない」にチェック |
+
+**単一用途（そのままコピーしてください）:**
+
+```
+Copy Salesforce Lightning record page links to the clipboard with a single click.
+```
 
 **権限の正当性（そのままコピーしてください）:**
 
@@ -64,6 +72,12 @@ This extension uses the following permissions:
 - declarativeContent: Required to enable the extension icon only on Salesforce Lightning record pages (*.lightning.force.com).
 
 The extension does not collect, transmit, or store any personal data. All processing occurs entirely within the user's browser.
+```
+
+**ホスト権限が必要な理由（そのままコピーしてください）:**
+
+```
+This extension requires host access to *.lightning.force.com to run a content script that reads the record name and field values from the Salesforce Lightning record page DOM. This information is used solely to generate a link and copy it to the clipboard. No data is transmitted externally.
 ```
 
 ### Step 5: 配布設定

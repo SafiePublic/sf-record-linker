@@ -2,7 +2,7 @@
 
 ## カテゴリ
 
-仕事効率化（Productivity）
+ツール（Tools）
 
 ---
 
