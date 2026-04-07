@@ -96,6 +96,7 @@ function buildLink(
     const showObjectName = cachedGlobalSettings.showObjectName;
     const linkNameOnly = cachedGlobalSettings.linkNameOnly;
 
+
     if (!setting?.enabled) {
       return prefixObjectName(formatBasicLink(recordName, url), objectLabel ?? '', showObjectName, linkNameOnly);
     }
@@ -175,6 +176,25 @@ function detectToastMessages(): string[] {
   return messages;
 }
 
+function findActiveRecordPage(): Element | Document {
+  const pages = document.querySelectorAll<HTMLElement>(
+    "one-record-home-flexipage2",
+  );
+  if (pages.length === 0) return document;
+  if (pages.length === 1) return pages[0];
+
+  // SPA遷移で古いDOMが残る場合、可視状態の要素を選ぶ
+  for (const page of pages) {
+    const rect = page.getBoundingClientRect();
+    if (rect.height > 0 && rect.width > 0) {
+      return page;
+    }
+  }
+
+  // フォールバック: 最後の要素（最新の遷移先）
+  return pages[pages.length - 1];
+}
+
 let cachedSettings: ObjectSettings = {};
 let cachedGlobalSettings: GlobalSettings = { ...DEFAULT_GLOBAL_SETTINGS };
 
@@ -217,8 +237,7 @@ function getRecordLink(): { success: boolean; html?: string; plain?: string; toa
     return { success: true, ...result, toasts };
   }
 
-  const startEl =
-    document.querySelector("one-record-home-flexipage2") || document;
+  const startEl = findActiveRecordPage();
 
   const nameEl = findRecordNameElement(startEl);
   if (!nameEl) return { success: false };
