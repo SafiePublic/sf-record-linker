@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "package": "npm run build && cd dist && zip -r ../sf-record-linker.zip . && cd .. && echo 'Created sf-record-linker.zip'"
+    "package": "npm run build && rm -f sf-record-linker.zip && cd dist && zip -r ../sf-record-linker.zip . && cd .. && echo 'Created sf-record-linker.zip'"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
